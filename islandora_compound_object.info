@@ -1,0 +1,5 @@
+name = Islandora Compound Object Solution Pack
+description = An object type and related tools for compound objects.
+dependencies[] = islandora
+package = Islandora
+core = 7.x

@@ -1,0 +1,6 @@
+<?php
+
+// In child object manage tab, form to add object to a parent (isPartOf rel? configurable rel)
+// In parent object tab, link to add child object
+// In parent object tab, link to create child object
+// Parent default view: child 1's view, with sibling (prev/next : thumbs) navigation
