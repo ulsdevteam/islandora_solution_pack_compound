@@ -93,11 +93,11 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
   batch_process();
 }
 
-function islandora_compound_object_set_children() {
+function islandora_compound_object_set_children($pid, $child_pids, &$context) {
 
 }
 
-function islandora_compound_object_set_parents() {
+function islandora_compound_object_set_parents($pid, $parent_pids, &$context) {
 
 }
 
