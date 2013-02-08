@@ -18,6 +18,12 @@ function islandora_compound_object_menu() {
     'access callback' => 'islandora_compound_object_access',
     'access arguments' => array(2),
   );
+  $items['tableselect'] = array(
+    'title' => 'Tableselect',
+    'page callback' => 'islandora_compound_tableselect',
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => true,
+  );
   return $items;
 }
 
@@ -29,6 +35,10 @@ function islandora_compound_object_access(FedoraObject $object) {
 }
 
 function islandora_compound_object_manage(FedoraObject $object) {
+  return drupal_get_form('islandora_compound_object_manage_form', $object->id);
+}
+
+function islandora_compound_object_manage_form($form, $form_state, $pid) {
   $form = array();
 
   // Check if is compound object?
@@ -40,22 +50,55 @@ function islandora_compound_object_manage(FedoraObject $object) {
 
   // Get potential children
   // @TODO: limit, filter, etc
-  $potential_parts = islandora_compound_object_get_potential_parts($object->id);
+  $potential_parts = islandora_compound_object_get_potential_parts($pid);
+  $children_header = array('pid' => t('Object ID'), 'label' => t('Label'));
 
-  $child_header = array('pid' => array('data' => t('Object ID')), 'label' => array('data' => t('Label')));
-  $form['add_children']['children'] = array(
+  $form['add_children']['parts'] = array(
     '#type' => 'tableselect',
-    '#header' => $child_header,
+    '#header' => $children_header,
     '#options' => $potential_parts,
-    '#empty' => t('No objects found'),
-    '#attributes' => array(),
   );
 
   $form['add_to_parent'] = array(
     '#type' => 'fieldset',
     '#title' => t('Associate with Parent Object'),
   );
+
+
+  $form['pid'] = array(
+    '#type' => 'value',
+    '#value' => $pid,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
   return $form;
+}
+
+function islandora_compound_object_manage_form_submit($form, &$form_state) {
+  $child_pids = @array_filter($form_state['values']['parts']);
+  $parent_pids = @array_filter($form_state['values']['parents']);
+
+  $batch = array(
+    'title' => t('Compound operations'),
+    'operations' => array(
+      array('islandora_compound_object_set_children', array($form_state['values']['pid'], $child_pids)),
+      array('islandora_compound_object_set_parents', array($form_state['values']['pid'], $parent_pids)),
+    ),
+  );
+  batch_set($batch);
+  batch_process();
+}
+
+function islandora_compound_object_set_children() {
+
+}
+
+function islandora_compound_object_set_parents() {
+
 }
 
 function islandora_compound_object_theme($existing, $type, $theme, $path) {
@@ -203,6 +246,6 @@ function islandora_compound_object_get_potential_parts($pid) {
       $objects[$result['object']['value']] = array('pid' => $result['object']['value'], 'label' => $result['title']['value']);
     }
   }
-  dpm($objects);
+
   return $objects;
 }
