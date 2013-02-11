@@ -18,13 +18,22 @@ function islandora_compound_object_menu() {
     'access callback' => 'islandora_compound_object_access',
     'access arguments' => array(2),
   );
-  $items['tableselect'] = array(
-    'title' => 'Tableselect',
-    'page callback' => 'islandora_compound_tableselect',
-    'type' => MENU_LOCAL_TASK,
-    'access callback' => true,
+  $items['islandora_compound_object/autocomplete'] = array(
+    'page callback' => 'islandora_compound_object_autocomplete_child',
+    'access arguments' => array('administer compound relationships'),
+    'page arguments' => array(2),
+    'type' => MENU_CALLBACK,
   );
   return $items;
+}
+
+function islandora_compound_object_permission() {
+  return array(
+    'administer compound relationships' => array(
+      'title' => t('Administer compound object relationships'),
+      'description' => t('Add a child to a parent.'),
+    ),
+  );
 }
 
 function islandora_compound_object_access(FedoraObject $object) {
@@ -50,15 +59,23 @@ function islandora_compound_object_manage_form($form, $form_state, $pid) {
 
   // Get potential children
   // @TODO: limit, filter, etc
-  $potential_parts = islandora_compound_object_get_potential_parts($pid);
-  $children_header = array('pid' => t('Object ID'), 'label' => t('Label'));
 
-  $form['add_children']['parts'] = array(
-    '#type' => 'tableselect',
-    '#header' => $children_header,
-    '#options' => $potential_parts,
+
+  $form['add_children']['child'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Child Object Pid/Label'),
+    '#autocomplete_path' => 'islandora_compound_object/autocomplete',
   );
+  /*
+ $potential_parts = islandora_compound_object_get_potential_parts($pid);
+ $children_header = array('pid' => t('Object ID'), 'label' => t('Label'));
 
+ $form['add_children']['parts'] = array(
+   '#type' => 'tableselect',
+   '#header' => $children_header,
+   '#options' => $potential_parts,
+ );
+ */
   $form['add_to_parent'] = array(
     '#type' => 'fieldset',
     '#title' => t('Associate with Parent Object'),
@@ -76,6 +93,12 @@ function islandora_compound_object_manage_form($form, $form_state, $pid) {
   );
 
   return $form;
+}
+
+function islandora_compound_object_autocomplete_child($string) {
+  $matches = array();
+
+  drupal_json_output(array($string => $string));
 }
 
 function islandora_compound_object_manage_form_submit($form, &$form_state) {
