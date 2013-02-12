@@ -44,47 +44,39 @@ function islandora_compound_object_access(FedoraObject $object) {
 }
 
 function islandora_compound_object_manage(FedoraObject $object) {
-  return drupal_get_form('islandora_compound_object_manage_form', $object->id);
+  return drupal_get_form('islandora_compound_object_manage_form', $object);
 }
 
-function islandora_compound_object_manage_form($form, $form_state, $pid) {
+function islandora_compound_object_manage_form($form, $form_state, $object) {
   $form = array();
 
-  // Check if is compound object?
+  // @TODO: Check if is compound object?
   $form['add_children'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add Child Objects'),
     '#description' => t('Add child objects as part of this compound object'),
   );
 
-  // Get potential children
-  // @TODO: limit, filter, etc
-
-
   $form['add_children']['child'] = array(
     '#type' => 'textfield',
     '#title' => t('Child Object Pid/Label'),
     '#autocomplete_path' => 'islandora_compound_object/autocomplete',
   );
-  /*
- $potential_parts = islandora_compound_object_get_potential_parts($pid);
- $children_header = array('pid' => t('Object ID'), 'label' => t('Label'));
 
- $form['add_children']['parts'] = array(
-   '#type' => 'tableselect',
-   '#header' => $children_header,
-   '#options' => $potential_parts,
- );
- */
   $form['add_to_parent'] = array(
     '#type' => 'fieldset',
     '#title' => t('Associate with Parent Object'),
   );
 
+  $form['add_to_parent']['parent'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Parent Object Pid/Label'),
+    '#autocomplete_path' => 'islandora_compound_object/autocomplete',
+  );
 
-  $form['pid'] = array(
+  $form['object'] = array(
     '#type' => 'value',
-    '#value' => $pid,
+    '#value' => $object,
   );
 
   $form['submit'] = array(
@@ -95,33 +87,87 @@ function islandora_compound_object_manage_form($form, $form_state, $pid) {
   return $form;
 }
 
-function islandora_compound_object_autocomplete_child($string) {
-  $matches = array();
+function islandora_compound_object_manage_form_validate($form, &$form_state) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+  $object = $form_state['values']['object'];
 
-  drupal_json_output(array($string => $string));
+  // Child
+  if (!empty($form_state['values']['child'])) {
+    // Check if valid child pid
+    if (!islandora_is_valid_pid($form_state['values']['child'])) {
+      form_set_error('child', t('Invalid object supplied.'));
+    }
+
+    // Do not allow child of self
+    if ($form_state['values']['child'] == $object->id) {
+      form_set_error('child', t('An object may not be a child of itself.'));
+    }
+
+    // Do not allow repeated child
+    $child_object = islandora_object_load($form_state['values']['child']);
+    $child_part_of = $child_object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'isPartOf');
+    foreach ($child_part_of AS $part) {
+      if ($part['object']['value'] == $object->id) {
+        form_set_error('child', t('The object is already a parent of the child.'));
+      }
+    }
+  }
+
+  // Parent
+  if (!empty($form_state['values']['parent'])) {
+    // Check if valid parent pid
+    if (!islandora_is_valid_pid($form_state['values']['parent'])) {
+      form_set_error('parent', t('Invalid object supplied.'));
+    }
+
+    // Do not allow parent of self
+    if ($form_state['values']['parent'] == $object->id) {
+      form_set_error('parent', t('An object may not be the parent of itself.'));
+    }
+
+    // Do not allow repeated parent
+    $parent_part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'isPartOf');
+    foreach ($parent_part_of AS $part) {
+      if ($part['object']['value'] == $form_state['values']['parent']) {
+        form_set_error('parent', t('The object is already a child of the parent.'));
+      }
+    }
+  }
+
+  if ($form_state['values']['parent'] == $form_state['values']['child']) {
+    form_set_error('child', t('An object may not be the parent and child of the same object.'));
+    form_set_error('parent');
+  }
+
 }
 
 function islandora_compound_object_manage_form_submit($form, &$form_state) {
-  $child_pids = @array_filter($form_state['values']['parts']);
-  $parent_pids = @array_filter($form_state['values']['parents']);
+  $object = $form_state['values']['object'];
 
-  $batch = array(
-    'title' => t('Compound operations'),
-    'operations' => array(
-      array('islandora_compound_object_set_children', array($form_state['values']['pid'], $child_pids)),
-      array('islandora_compound_object_set_parents', array($form_state['values']['pid'], $parent_pids)),
-    ),
-  );
-  batch_set($batch);
-  batch_process();
+  if (!empty($form_state['values']['child'])) {
+    $child_object = islandora_object_load($form_state['values']['child']);
+    $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $object->id);
+  }
+
+  if (!empty($form_state['values']['parent'])) {
+    $object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $form_state['values']['parent']);
+  }
+
+  drupal_set_message(t('Compound relationships added successfully.'));
 }
 
-function islandora_compound_object_set_children($pid, $child_pids, &$context) {
+function islandora_compound_object_autocomplete_child($string) {
+  $matches = array();
 
-}
+  $islandora_tuque = new IslandoraTuque();
 
-function islandora_compound_object_set_parents($pid, $parent_pids, &$context) {
+  $results = $islandora_tuque->api->a->findObjects('terms', '*' . $string . '*', 10);
 
+  foreach ($results['results'] AS $result) {
+    $matches[$result['pid']] = $result['title'] . ' (' . $result['pid'] . ')';
+  }
+
+  drupal_json_output($matches);
 }
 
 function islandora_compound_object_theme($existing, $type, $theme, $path) {
@@ -129,6 +175,7 @@ function islandora_compound_object_theme($existing, $type, $theme, $path) {
     'islandora_compound_prev_next' => array(
       'file' => 'theme/theme.inc',
       'variables' => array(
+        'parent_label' => NULL,
         'previous_pid' => NULL,
         'next_pid' => NULL,
       ),
@@ -214,6 +261,8 @@ function islandora_compound_object_islandora_view_object_alter(&$object, &$rende
   if (count($part_of)) {
     foreach ($part_of AS $part) {
       $parent_pid = $part['object']['value'];
+      $parent = islandora_object_load($parent_pid);
+
       $siblings = islandora_compound_object_get_parts($parent_pid);
 
       $current_key = array_search($object->id, $siblings);
@@ -221,13 +270,28 @@ function islandora_compound_object_islandora_view_object_alter(&$object, &$rende
       $previous_pid = (isset($siblings[$current_key - 1])) ? $siblings[$current_key - 1] : '';
       $next_pid = (isset($siblings[$current_key + 1])) ? $siblings[$current_key + 1] : '';
 
-      $prev_next = theme('islandora_compound_prev_next', array('previous_pid' => $previous_pid, 'next_pid' => $next_pid));
+      $prev_next = theme('islandora_compound_prev_next',
+        array(
+          'parent_label' => $parent->label,
+          'previous_pid' => $previous_pid,
+          'next_pid' => $next_pid
+        ));
 
       $rendered[] = $prev_next;
     }
   }
+}
 
+///
+//hook_CMODEL_PID_islandora_view_object($object) function islandora_compound_object_islandora
 
+function islandora_compound_object_islandora_compoundCModel_islandora_view_object($object) {
+  // Get view of first child
+  $children = islandora_compound_object_get_parts($object->id);
+  if (!empty($children)) {
+    $first_child = islandora_object_load($children[0]);
+    return islandora_view_object($first_child);
+  }
 }
 
 /**
@@ -246,27 +310,6 @@ function islandora_compound_object_get_parts($pid) {
 
     foreach ($results AS $result) {
       $objects[] = $result['object']['value'];
-    }
-  }
-
-  return $objects;
-}
-
-function islandora_compound_object_get_potential_parts($pid) {
-  $objects = array();
-
-  $connection = islandora_get_tuque_connection();
-
-  if ($connection) {
-    $query = 'select $object $title from <#ri>
-                where $object <dc:title> $title
-                and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                minus $object <info:fedora/fedora-system:def/relations-external#isPartOf> <info:fedora/' . $pid . '>
-                order by $object';
-    $results = $connection->repository->ri->itqlQuery($query);
-
-    foreach ($results AS $result) {
-      $objects[$result['object']['value']] = array('pid' => $result['object']['value'], 'label' => $result['title']['value']);
     }
   }
 
