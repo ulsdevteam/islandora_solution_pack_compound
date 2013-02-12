@@ -7,6 +7,7 @@
 // Parent default view: child 1's view, with sibling (prev/next : thumbs) navigation
 // Default sort of siblings? configurable?
 // Cache children of compound object
+// Optional block with compound navigation
 
 function islandora_compound_object_menu() {
   $items = array();
