@@ -2,6 +2,13 @@
 
 function islandora_compound_object_menu() {
   $items = array();
+  $items['admin/islandora/compound_object'] = array(
+    'title' => 'Compound objects',
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('administer compound relationships'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => 'islandora_compound_object_admin'
+  );
   $items['islandora/object/%islandora_object/manage/compound'] = array(
     'title' => 'Compound',
     'page callback' => 'islandora_compound_object_manage',
@@ -33,6 +40,12 @@ function islandora_compound_object_access(FedoraObject $object) {
     return FALSE;
   }
   return TRUE;
+}
+
+function islandora_compound_object_admin($form, $form_state) {
+  $form = array();
+
+  return $form;
 }
 
 function islandora_compound_object_manage(FedoraObject $object) {
@@ -305,9 +318,6 @@ function islandora_compound_object_islandora_view_object_alter(&$object, &$rende
     }
   }
 }
-
-///
-//hook_CMODEL_PID_islandora_view_object($object) function islandora_compound_object_islandora
 
 function islandora_compound_object_islandora_compoundCModel_islandora_view_object($object) {
   // Get view of first child
