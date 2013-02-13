@@ -2,7 +2,7 @@
 
 function theme_islandora_compound_prev_next($variables) {
   $output = '<div class="islandora-compound-prev-next">';
-  $output .= '<h3>' . check_plain($variables['parent_label']) . '</h3>';
+  $output .= '<h3>' . t('Part of: ') . check_plain($variables['parent_label']) . '</h3>';
 
   if (!empty($variables['previous_pid'])) {
     $output .= l(t('Previous'), 'islandora/object/' . $variables['previous_pid']);

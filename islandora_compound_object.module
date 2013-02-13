@@ -1,13 +1,4 @@
 <?php
-// @TODO: Proper compound object form
-
-// In child object manage tab, form to add object to a parent (isPartOf rel? configurable rel)
-// In parent object tab, link to add child object
-// In parent object tab, link to create child object
-// Parent default view: child 1's view, with sibling (prev/next : thumbs) navigation
-// Default sort of siblings? configurable?
-// Cache children of compound object
-// Optional block with compound navigation
 
 function islandora_compound_object_menu() {
   $items = array();
@@ -145,16 +136,48 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
 function islandora_compound_object_manage_form_submit($form, &$form_state) {
   $object = $form_state['values']['object'];
 
+  // Relationship from child to this object
   if (!empty($form_state['values']['child'])) {
     $child_object = islandora_object_load($form_state['values']['child']);
     $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $object->id);
+
+    // @TODO: make conditional on admin setting
+    islandora_compound_object_update_parent_thumbnail($child_object, $object);
   }
 
+  // Add relationship to parent
   if (!empty($form_state['values']['parent'])) {
     $object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $form_state['values']['parent']);
+
+    islandora_compound_object_update_parent_thumbnail($object, islandora_object_load($form_state['values']['parent']));
   }
 
   drupal_set_message(t('Compound relationships added successfully.'));
+}
+
+function islandora_compound_object_update_parent_thumbnail($child, $parent) {
+  $parts = islandora_compound_object_get_parts($parent->id);
+
+  // Child has just been added maybe? Can this be relied upon?
+  if (count($parts) == 1) {
+    $mime_detector = new MimeDetect();
+    $ext = $mime_detector->getExtension($child['TN']->mimeType);
+    $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
+    $child['TN']->getContent($file);
+
+    if (empty($parent['TN'])) {
+      $ds = $parent->constructDatastream('TN', 'M');
+      $parent->ingestDatastream($ds);
+    }
+    else {
+      $ds = $parent['TN'];
+    }
+    $ds->setContentFromFile($file, TRUE);
+    $ds->label = 'Thumbnail';
+    $ds->mimetype = $mime_detector->getMimetype($file);
+
+    file_unmanaged_delete($file);
+  }
 }
 
 function islandora_compound_object_autocomplete_child($string) {
