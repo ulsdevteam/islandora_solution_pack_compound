@@ -1,31 +1,49 @@
 <?php
 
+/**
+ * @file
+ * Islandora Compound Object Solution Pack
+ * Enables parent-child relationships between objects with navigation features.
+ *
+ * Hook implementations and general functions.
+ */
+
+define('ISLANDORA_COMPOUND_OBJECT_CMODEL', 'islandora:compoundCModel');
+
+/**
+ * Implements hook_menu().
+ */
 function islandora_compound_object_menu() {
   $items = array();
   $items['admin/islandora/compound_object'] = array(
     'title' => 'Compound objects',
-    'type' => MENU_NORMAL_ITEM,
     'access arguments' => array('administer compound relationships'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => 'islandora_compound_object_admin'
+    'page arguments' => array('islandora_compound_object_admin_form'),
+    'file' => 'includes/admin.form.inc',
+    'type' => MENU_NORMAL_ITEM,
   );
   $items['islandora/object/%islandora_object/manage/compound'] = array(
     'title' => 'Compound',
     'page callback' => 'islandora_compound_object_manage',
     'page arguments' => array(2),
-    'type' => MENU_LOCAL_TASK,
     'access callback' => 'islandora_compound_object_access',
     'access arguments' => array(2),
+    'file' => 'includes/manage.form.inc',
+    'type' => MENU_LOCAL_TASK,
   );
   $items['islandora_compound_object/autocomplete'] = array(
     'page callback' => 'islandora_compound_object_autocomplete_child',
-    'access arguments' => array('administer compound relationships'),
     'page arguments' => array(2),
+    'access arguments' => array('administer compound relationships'),
     'type' => MENU_CALLBACK,
   );
   return $items;
 }
 
+/**
+ * Implements hook_permission().
+ */
 function islandora_compound_object_permission() {
   return array(
     'administer compound relationships' => array(
@@ -35,178 +53,9 @@ function islandora_compound_object_permission() {
   );
 }
 
-function islandora_compound_object_access(FedoraObject $object) {
-  if (!isset($object)) {
-    return FALSE;
-  }
-  return TRUE;
-}
-
-function islandora_compound_object_admin($form, $form_state) {
-  $form = array();
-
-  return $form;
-}
-
-function islandora_compound_object_manage(FedoraObject $object) {
-  return drupal_get_form('islandora_compound_object_manage_form', $object);
-}
-
-function islandora_compound_object_manage_form($form, $form_state, $object) {
-  $form = array();
-
-  // @TODO: Check if is compound object?
-  $form['add_children'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Add Child Objects'),
-    '#description' => t('Add child objects as part of this compound object'),
-  );
-
-  $form['add_children']['child'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Child Object Pid/Label'),
-    '#autocomplete_path' => 'islandora_compound_object/autocomplete',
-  );
-
-  $form['add_to_parent'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Associate with Parent Object'),
-  );
-
-  $form['add_to_parent']['parent'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Parent Object Pid/Label'),
-    '#autocomplete_path' => 'islandora_compound_object/autocomplete',
-  );
-
-  $form['object'] = array(
-    '#type' => 'value',
-    '#value' => $object,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-
-  return $form;
-}
-
-function islandora_compound_object_manage_form_validate($form, &$form_state) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-  $object = $form_state['values']['object'];
-
-  // Child
-  if (!empty($form_state['values']['child'])) {
-    // Check if valid child pid
-    if (!islandora_is_valid_pid($form_state['values']['child'])) {
-      form_set_error('child', t('Invalid object supplied.'));
-    }
-
-    // Do not allow child of self
-    if ($form_state['values']['child'] == $object->id) {
-      form_set_error('child', t('An object may not be a child of itself.'));
-    }
-
-    // Do not allow repeated child
-    $child_object = islandora_object_load($form_state['values']['child']);
-    $child_part_of = $child_object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'isPartOf');
-    foreach ($child_part_of AS $part) {
-      if ($part['object']['value'] == $object->id) {
-        form_set_error('child', t('The object is already a parent of the child.'));
-      }
-    }
-  }
-
-  // Parent
-  if (!empty($form_state['values']['parent'])) {
-    // Check if valid parent pid
-    if (!islandora_is_valid_pid($form_state['values']['parent'])) {
-      form_set_error('parent', t('Invalid object supplied.'));
-    }
-
-    // Do not allow parent of self
-    if ($form_state['values']['parent'] == $object->id) {
-      form_set_error('parent', t('An object may not be the parent of itself.'));
-    }
-
-    // Do not allow repeated parent
-    $parent_part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'isPartOf');
-    foreach ($parent_part_of AS $part) {
-      if ($part['object']['value'] == $form_state['values']['parent']) {
-        form_set_error('parent', t('The object is already a child of the parent.'));
-      }
-    }
-  }
-
-  if ($form_state['values']['parent'] == $form_state['values']['child']) {
-    form_set_error('child', t('An object may not be the parent and child of the same object.'));
-    form_set_error('parent');
-  }
-
-}
-
-function islandora_compound_object_manage_form_submit($form, &$form_state) {
-  $object = $form_state['values']['object'];
-
-  // Relationship from child to this object
-  if (!empty($form_state['values']['child'])) {
-    $child_object = islandora_object_load($form_state['values']['child']);
-    $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $object->id);
-
-    // @TODO: make conditional on admin setting
-    islandora_compound_object_update_parent_thumbnail($child_object, $object);
-  }
-
-  // Add relationship to parent
-  if (!empty($form_state['values']['parent'])) {
-    $object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $form_state['values']['parent']);
-
-    islandora_compound_object_update_parent_thumbnail($object, islandora_object_load($form_state['values']['parent']));
-  }
-
-  drupal_set_message(t('Compound relationships added successfully.'));
-}
-
-function islandora_compound_object_update_parent_thumbnail($child, $parent) {
-  $parts = islandora_compound_object_get_parts($parent->id);
-
-  // Child has just been added maybe? Can this be relied upon?
-  if (count($parts) == 1) {
-    $mime_detector = new MimeDetect();
-    $ext = $mime_detector->getExtension($child['TN']->mimeType);
-    $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
-    $child['TN']->getContent($file);
-
-    if (empty($parent['TN'])) {
-      $ds = $parent->constructDatastream('TN', 'M');
-      $parent->ingestDatastream($ds);
-    }
-    else {
-      $ds = $parent['TN'];
-    }
-    $ds->setContentFromFile($file, TRUE);
-    $ds->label = 'Thumbnail';
-    $ds->mimetype = $mime_detector->getMimetype($file);
-
-    file_unmanaged_delete($file);
-  }
-}
-
-function islandora_compound_object_autocomplete_child($string) {
-  $matches = array();
-
-  $islandora_tuque = new IslandoraTuque();
-
-  $results = $islandora_tuque->api->a->findObjects('terms', '*' . $string . '*', 10);
-
-  foreach ($results['results'] AS $result) {
-    $matches[$result['pid']] = $result['title'] . ' (' . $result['pid'] . ')';
-  }
-
-  drupal_json_output($matches);
-}
-
+/**
+ * Implements hook_theme().
+ */
 function islandora_compound_object_theme($existing, $type, $theme, $path) {
   return array(
     'islandora_compound_prev_next' => array(
@@ -220,10 +69,13 @@ function islandora_compound_object_theme($existing, $type, $theme, $path) {
   );
 }
 
+/**
+ * Implements hook_islandora_required_objects().
+ */
 function islandora_compound_object_islandora_required_objects(IslandoraTuque $connection) {
   $module_path = drupal_get_path('module', 'islandora_compound_object');
 
-  $compound_content_model = $connection->repository->constructObject('islandora:compoundCModel');
+  $compound_content_model = $connection->repository->constructObject(ISLANDORA_COMPOUND_OBJECT_CMODEL);
   $compound_content_model->owner = 'fedoraAdmin';
   $compound_content_model->label = 'Islandora Compound Object Content Model';
   $compound_content_model->models = 'fedora-system:ContentModel-3.0';
@@ -281,7 +133,7 @@ function islandora_compound_object_islandora_xml_form_builder_forms() {
 function islandora_compound_object_islandora_content_model_forms_form_associations() {
   return array(
     'islandora_compound_mods_form' => array(
-      'content_model' => 'islandora:compoundCModel',
+      'content_model' => ISLANDORA_COMPOUND_OBJECT_CMODEL,
       'form_name' => 'Compound Object MODS form',
       'dsid' => 'MODS',
       'title_field' => array('titleInfo', 'title'),
@@ -291,11 +143,15 @@ function islandora_compound_object_islandora_content_model_forms_form_associatio
   );
 }
 
+/**
+ * Implements hook_islandora_view_object_alter().
+ */
 function islandora_compound_object_islandora_view_object_alter(&$object, &$rendered) {
-  $part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'isPartOf');
+  $rels_predicate = variable_get('islandora_compound_object_relationship', 'isPartOf');
+  $part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
 
   // This object is part of a compound object
-  if (count($part_of)) {
+  if (!empty($part_of)) {
     foreach ($part_of AS $part) {
       $parent_pid = $part['object']['value'];
       $parent = islandora_object_load($parent_pid);
@@ -319,6 +175,9 @@ function islandora_compound_object_islandora_view_object_alter(&$object, &$rende
   }
 }
 
+/**
+ * Implements hook_islandora_cmodel_islandora_view_object().
+ */
 function islandora_compound_object_islandora_compoundCModel_islandora_view_object($object) {
   // Get view of first child
   $children = islandora_compound_object_get_parts($object->id);
@@ -329,17 +188,73 @@ function islandora_compound_object_islandora_compoundCModel_islandora_view_objec
 }
 
 /**
+ * Access callback for compound object management.
+ */
+function islandora_compound_object_access(FedoraObject $object) {
+  if (!isset($object)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * Replaces parent object thumbnail with child's thumbnail.
+ */
+function islandora_compound_object_update_parent_thumbnail($child, $parent) {
+  $parts = islandora_compound_object_get_parts($parent->id);
+
+  // Child has just been added maybe? Can this be relied upon?
+  if (count($parts) == 1) {
+    $mime_detector = new MimeDetect();
+    $ext = $mime_detector->getExtension($child['TN']->mimeType);
+    $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
+    $child['TN']->getContent($file);
+
+    if (empty($parent['TN'])) {
+      $ds = $parent->constructDatastream('TN', 'M');
+      $parent->ingestDatastream($ds);
+    }
+    else {
+      $ds = $parent['TN'];
+    }
+    $ds->setContentFromFile($file, TRUE);
+    $ds->label = 'Thumbnail';
+    $ds->mimetype = $mime_detector->getMimetype($file);
+
+    file_unmanaged_delete($file);
+  }
+}
+
+/**
+ * Autocomplete callback for object search.
+ */
+function islandora_compound_object_autocomplete_child($string) {
+  $matches = array();
+
+  $islandora_tuque = new IslandoraTuque();
+
+  $results = $islandora_tuque->api->a->findObjects('terms', '*' . $string . '*', 10);
+
+  foreach ($results['results'] AS $result) {
+    $matches[$result['pid']] = $result['title'] . ' (' . $result['pid'] . ')';
+  }
+
+  drupal_json_output($matches);
+}
+
+/**
  * Return an array of pids that are part of a compound object.
- *
- * @param $pid
  */
 function islandora_compound_object_get_parts($pid) {
+  $rels_predicate = variable_get('islandora_compound_object_relationship', 'isPartOf');
   $objects = array();
 
   $connection = islandora_get_tuque_connection();
 
   if ($connection) {
-    $query = 'select $object from <#ri> where $object <info:fedora/fedora-system:def/relations-external#isPartOf> <info:fedora/' . $pid . '> order by $object';
+    $query = 'select $object from <#ri>
+              where $object <info:fedora/fedora-system:def/relations-external#' . $rels_predicate . '> <info:fedora/' . $pid . '>
+              order by $object';
     $results = $connection->repository->ri->itqlQuery($query);
 
     foreach ($results AS $result) {
