@@ -1,4 +1,5 @@
-
+// If has permission, link to parent's metadata tab
+// Click on object in tree, ajax to get first level children
 // Dedicated compound object form
 // In parent object tab, link to create child object
 // Thumbs navigation?

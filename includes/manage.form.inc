@@ -114,7 +114,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     }
   }
 
-  if (!empty($form_state['values']['parent']) && $form_state['values']['parent'] == $form_state['values']['child']) {
+  if (!empty($form_state['values']['parent']) && !empty($form_state['values']['child']) && $form_state['values']['parent'] == $form_state['values']['child']) {
     form_set_error('child', t('An object may not be the parent and child of the same object.'));
     form_set_error('parent');
   }

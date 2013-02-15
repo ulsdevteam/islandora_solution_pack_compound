@@ -1,0 +1,13 @@
+.islandora-compound-prev-next {
+    border-bottom: 1px solid #b3b3b3;
+}
+
+.islandora-compound-thumbs {
+    display: block;
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+
+.islandora-compound-thumbs img {
+    margin: 5px 5px 5px 5px;
+}
