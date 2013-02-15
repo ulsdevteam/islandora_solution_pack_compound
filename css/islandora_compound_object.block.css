@@ -5,7 +5,7 @@
 .islandora-compound-thumbs {
     display: block;
     white-space: nowrap;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 .islandora-compound-thumbs img {
