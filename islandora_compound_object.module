@@ -245,20 +245,26 @@ function islandora_compound_object_autocomplete_child($string) {
 /**
  * Return an array of pids that are part of a compound object.
  */
-function islandora_compound_object_get_parts($pid) {
+function islandora_compound_object_get_parts($pid, $ret_title = FALSE) {
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isPartOf');
   $objects = array();
 
   $connection = islandora_get_tuque_connection();
 
   if ($connection) {
-    $query = 'select $object from <#ri>
-              where $object <info:fedora/fedora-system:def/relations-external#' . $rels_predicate . '> <info:fedora/' . $pid . '>
+    $query = 'select $object $title from <#ri>
+              where $object <dc:title> $title 
+              and $object <info:fedora/fedora-system:def/relations-external#' . $rels_predicate . '> <info:fedora/' . $pid . '>
               order by $object';
     $results = $connection->repository->ri->itqlQuery($query);
 
     foreach ($results AS $result) {
-      $objects[] = $result['object']['value'];
+      if ($ret_title) {
+        $objects[$result['object']['value']] = array('pid' => $result['object']['value'], 'title' => $result['title']['value']);
+      }
+      else {
+        $objects[] = $result['object']['value'];
+      }
     }
   }
 

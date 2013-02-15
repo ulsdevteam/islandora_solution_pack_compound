@@ -21,15 +21,15 @@ function islandora_compound_object_manage_form($form, $form_state, $object) {
     );
 
     // Remove children
-    $children = islandora_compound_object_get_parts($object->id);
+    $children = islandora_compound_object_get_parts($object->id, TRUE);
     if (!empty($children)) {
       $form['children'] = array(
         '#type' => 'fieldset',
         '#title' => t('Remove Child Objects'),
         '#description' => t('Remove child objects of as part of this compound object'),
       );
-
-      $header = array(t('Object ID'));
+      
+      $header = array('title' => t('Title'), 'pid' => t('Object ID'));
       $form['children']['remove_children'] = array(
         '#type' => 'tableselect',
         '#title' => t('Children'),
@@ -114,7 +114,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     }
   }
 
-  if ($form_state['values']['parent'] == $form_state['values']['child']) {
+  if (!empty($form_state['values']['parent']) && $form_state['values']['parent'] == $form_state['values']['child']) {
     form_set_error('child', t('An object may not be the parent and child of the same object.'));
     form_set_error('parent');
   }
@@ -144,6 +144,16 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
       islandora_compound_object_update_parent_thumbnail($object, islandora_object_load($form_state['values']['parent']));
     }
   }
-
-  drupal_set_message(t('Compound relationships added successfully.'));
+  
+  // Remove children
+  // @TODO: batch
+  if (!empty($form_state['values']['remove_children'])) {
+    foreach ($form_state['values']['remove_children'] AS $child) {
+      $child_object = islandora_object_load($child);
+      $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $object->id);
+    }
+  }
+  
+  // @TODO: actually confirm
+  drupal_set_message(t('Compound relationships modified.'));
 }
