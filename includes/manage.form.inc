@@ -6,6 +6,7 @@ function islandora_compound_object_manage(FedoraObject $object) {
 
 function islandora_compound_object_manage_form($form, $form_state, $object) {
   $form = array();
+  $rels_predicate = variable_get('islandora_compound_object_relationship', 'isPartOf');
 
   // Add child objects
   if (variable_get('islandora_compound_object_compound_children', TRUE) && in_array(ISLANDORA_COMPOUND_OBJECT_CMODEL, $object->models)) {
@@ -51,7 +52,30 @@ function islandora_compound_object_manage_form($form, $form_state, $object) {
     '#autocomplete_path' => 'islandora_compound_object/autocomplete',
   );
 
+  // Remove parents
+  $parent_part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
+  if (!empty($parent_part_of)) {
+    $form['parents'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Unlink From Parent'),
+      '#description' => t('Remove the relationship between this object and parent objects.'),
+    );
 
+    $parents = array();
+    foreach ($parent_part_of AS $parent) {
+      // Shouldn't be too much of a hit but would be good to avoid the object_loads
+      $pid = $parent['object']['value'];
+      $parent_object = islandora_object_load($pid);
+      $parents[$pid] = array('title' => $parent_object->label, 'pid' => $pid);
+    }
+
+    $form['parents']['unlink_parents'] = array(
+      '#type' => 'tableselect',
+      '#title' => t('Parents'),
+      '#header' => array('title' => t('Title'), 'pid' => t('Object ID')),
+      '#options' => $parents
+    );
+  }
 
   $form['object'] = array(
     '#type' => 'value',
@@ -153,7 +177,16 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
       $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $object->id);
     }
   }
-  
+
+  // Unlink parents
+  /*
+  if (!empty($form_state['values']['unlink_parents'])) {
+    foreach ($form_state['values']['unlink_parents'] AS $parent) {
+      $object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $parent);
+    }
+  }
+  */
+  dpm($form_state['values']['unlink_parents']);
   // @TODO: actually confirm
   drupal_set_message(t('Compound relationships modified.'));
 }
