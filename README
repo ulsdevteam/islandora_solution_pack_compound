@@ -1,3 +1,4 @@
+// Parent manage tab if perm
 // Active image thumb
 // If has permission, link to parent's metadata tab
 // Click on object in tree, ajax to get first level children
