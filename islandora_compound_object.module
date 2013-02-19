@@ -253,7 +253,7 @@ function islandora_compound_object_access(FedoraObject $object) {
   if (!isset($object)) {
     return FALSE;
   }
-  return TRUE;
+  return user_access('administer compound relationships');
 }
 
 /**
