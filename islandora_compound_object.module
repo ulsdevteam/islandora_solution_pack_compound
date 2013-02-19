@@ -38,6 +38,7 @@ function islandora_compound_object_menu() {
     'access arguments' => array('administer compound relationships'),
     'type' => MENU_CALLBACK,
   );
+
   return $items;
 }
 
@@ -203,10 +204,18 @@ function islandora_compound_object_navigation_block() {
         $previous_pid = (isset($siblings[$current_key - 1])) ? $siblings[$current_key - 1] : '';
         $next_pid = (isset($siblings[$current_key + 1])) ? $siblings[$current_key + 1] : '';
 
+        // Check if perms to show link for parent manage
+        if (islandora_object_manage_access_callback(array(FEDORA_MANAGE_DATASTREAMS, FEDORA_MANAGE_PROPERTIES, FEDORA_ADD_DS), $parent)) {
+          $parent_url = 'islandora/object/' . $parent_pid . '/manage';
+        }
+        else {
+          $parent_url = FALSE;
+        }
+
         $prev_next = theme('islandora_compound_prev_next',
           array(
             'parent_label' => $parent->label,
-            'parent_url' => 'islandora/object/' . $parent_pid . '/manage',
+            'parent_url' => $parent_url,
             'previous_pid' => $previous_pid,
             'next_pid' => $next_pid,
             'child_count' => count($siblings),

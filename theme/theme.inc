@@ -2,8 +2,13 @@
 
 function theme_islandora_compound_prev_next($variables) {
   $output = '<div class="islandora-compound-prev-next">';
-  $output .= '<h3>' . t('Part of: ') . check_plain($variables['parent_label']) . ' (' . $variables['child_count'] .
-    ' ' . t('objects') . ')</h3>';
+  $output .= '<h3>' . t('Part of: ') . check_plain($variables['parent_label']) . ' (' . $variables['child_count'] . ' '
+    . t('objects') . ') ';
+
+  if ($variables['parent_url']) {
+    $output .= l(t('manage parent'), $variables['parent_url']);
+  }
+  $output .= '</h3>';
 
   if (!empty($variables['previous_pid'])) {
     $output .= l(t('Previous'), 'islandora/object/' . $variables['previous_pid']);
