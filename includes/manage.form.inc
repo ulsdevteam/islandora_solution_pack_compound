@@ -173,20 +173,22 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
   // @TODO: batch
   if (!empty($form_state['values']['remove_children'])) {
     foreach ($form_state['values']['remove_children'] AS $child) {
-      $child_object = islandora_object_load($child);
-      $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $object->id);
+      if ($child) {
+        $child_object = islandora_object_load($child);
+        $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $object->id);
+      }
     }
   }
 
   // Unlink parents
-  /*
   if (!empty($form_state['values']['unlink_parents'])) {
     foreach ($form_state['values']['unlink_parents'] AS $parent) {
-      $object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $parent);
+      if ($parent) {
+        $object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $parent);
+      }
     }
   }
-  */
-  dpm($form_state['values']['unlink_parents']);
+
   // @TODO: actually confirm
   drupal_set_message(t('Compound relationships modified.'));
 }
