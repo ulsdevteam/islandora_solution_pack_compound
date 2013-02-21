@@ -12,13 +12,13 @@
  */
 function theme_islandora_compound_prev_next($variables) {
   $output = '<div class="islandora-compound-prev-next">';
-  $output .= '<h3>' . t('Part of: @parent (@count objects)',
+  $output .= '<span class="islandora-compound-title">' . t('Part of: @parent (@count objects)',
     array('@parent' => $variables['parent_label'], '@count' => $variables['child_count']));
 
   if ($variables['parent_url']) {
     $output .= ' ' . l(t('manage parent'), $variables['parent_url']);
   }
-  $output .= '</h3>';
+  $output .= '</span><br/>';
 
   if (!empty($variables['previous_pid'])) {
     $output .= l(t('Previous'), 'islandora/object/' . $variables['previous_pid']);
