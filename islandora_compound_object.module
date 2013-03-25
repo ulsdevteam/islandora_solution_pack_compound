@@ -318,11 +318,16 @@ function islandora_compound_object_get_parts($pid, $ret_title = FALSE) {
   $connection = islandora_get_tuque_connection();
 
   if ($connection) {
-    $query = 'select $object $title from <#ri>
-              where $object <dc:title> $title
-              and $object <info:fedora/fedora-system:def/relations-external#' . $rels_predicate . '> <info:fedora/' . $pid . '>
-              order by $object';
-    $results = $connection->repository->ri->itqlQuery($query);
+    $query = <<<EOQ
+SELECT ?object ?title
+FROM <#ri>
+WHERE {
+  ?object <fedora-model:label> ?title ;
+          <fedora-rels-ext:$rels_predicate> <info:fedora/$pid> .
+}
+ORDER BY ?object
+EOQ;
+    $results = $connection->repository->ri->sparqlQuery($query);
 
     foreach ($results AS $result) {
       if ($ret_title) {
