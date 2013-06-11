@@ -70,6 +70,10 @@ function islandora_compound_object_theme($existing, $type, $theme, $path) {
         'pid' => NULL,
       ),
     ),
+    'islandora_compound_object_draggable_table' => array(
+      'render element' => 'form',
+      'file' => 'theme/theme.inc',
+    ),
   );
 }
 
@@ -313,27 +317,52 @@ function islandora_compound_object_get_parts($pid, $ret_title = FALSE) {
   $objects = array();
 
   $connection = islandora_get_tuque_connection();
-
+  $escaped_pid = str_replace(':', '_', $pid);
   if ($connection) {
     $query = <<<EOQ
-SELECT ?object ?title
+PREFIX islandora-rels-ext: <http://islandora.ca/ontology/relsext#>
+SELECT ?object ?title ?seq
 FROM <#ri>
 WHERE {
   ?object <fedora-model:label> ?title ;
           <fedora-rels-ext:$rels_predicate> <info:fedora/$pid> .
+  OPTIONAL {
+    ?object islandora-rels-ext:isSequenceNumberOf$escaped_pid ?seq
+  }
 }
-ORDER BY ?object
 EOQ;
     $results = $connection->repository->ri->sparqlQuery($query);
 
+    // Sort the objects into their proper order.
+    $sort = function($a, $b) {
+      $a = $a['seq']['value'];
+      $b = $b['seq']['value'];
+      if ($a === $b) {
+        return 0;
+      }
+      if (empty($a)) {
+        return 1;
+      }
+      if (empty($b)) {
+        return -1;
+      }
+      return $a - $b;
+    };
+    uasort($results, $sort);
+
     foreach ($results as $result) {
       if ($ret_title) {
-        $objects[$result['object']['value']] = array('pid' => $result['object']['value'], 'title' => $result['title']['value']);
+        $objects[$result['object']['value']] = array(
+          'pid' => $result['object']['value'],
+          'title' => $result['title']['value'],
+          'seq' => $result['seq']['value'],
+        );
       }
       else {
         $objects[] = $result['object']['value'];
       }
     }
   }
+
   return $objects;
 }
