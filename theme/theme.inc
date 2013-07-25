@@ -11,7 +11,6 @@
  * Theme function for the compound navigation block parts.
  */
 function theme_islandora_compound_prev_next($variables) {
-  global $user;
   $output = '<div class="islandora-compound-prev-next">';
   $output .= '<span class="islandora-compound-title">' . t('Part of: @parent (@count objects)',
     array('@parent' => $variables['parent_label'], '@count' => $variables['child_count']));
@@ -42,7 +41,7 @@ function theme_islandora_compound_prev_next($variables) {
         $active = array();
       }
       $sibling_object = islandora_object_load($sibling);
-      if (isset($sibling_object['TN']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $sibling_object['TN'], $user)) {
+      if (isset($sibling_object['TN']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $sibling_object['TN'])) {
         $path = 'islandora/object/' . $sibling . '/datastream/TN/view';
       }
       else {
