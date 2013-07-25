@@ -313,7 +313,6 @@ function islandora_compound_object_autocomplete_child($string) {
  * Return an array of pids that are part of a compound object.
  */
 function islandora_compound_object_get_parts($pid, $ret_title = FALSE) {
-  global $user;
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isPartOf');
   $objects = array();
 
@@ -353,7 +352,7 @@ EOQ;
 
     foreach ($results as $result) {
       $object = islandora_object_load($result['object']['value']);
-      if (islandora_object_access(FEDORA_VIEW_OBJECTS, $object, $user)) {
+      if (islandora_object_access(FEDORA_VIEW_OBJECTS, $object)) {
         if ($ret_title) {
           $objects[$result['object']['value']] = array(
             'pid' => $result['object']['value'],
