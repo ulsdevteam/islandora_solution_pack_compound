@@ -11,6 +11,7 @@
  * Theme function for the compound navigation block parts.
  */
 function theme_islandora_compound_prev_next($variables) {
+  global $user;
   $output = '<div class="islandora-compound-prev-next">';
   $output .= '<span class="islandora-compound-title">' . t('Part of: @parent (@count objects)',
     array('@parent' => $variables['parent_label'], '@count' => $variables['child_count']));
@@ -40,11 +41,20 @@ function theme_islandora_compound_prev_next($variables) {
       else {
         $active = array();
       }
-
+      $sibling_object = islandora_object_load($sibling);
+      if (isset($sibling_object['TN']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $sibling_object['TN'], $user)) {
+        $path = 'islandora/object/' . $sibling . '/datastream/TN/view';
+      }
+      else {
+        // Object either does not have a thumbnail or it's restricted show a
+        // default in its place.
+        $image_path = drupal_get_path('module', 'islandora');
+        $path = "$image_path/images/folder.png";
+      }
       $output .= l(
         theme_image(
           array(
-            'path' => 'islandora/object/' . $sibling . '/datastream/TN/view',
+            'path' => $path,
             'attributes' => array(),
           )
         ),
