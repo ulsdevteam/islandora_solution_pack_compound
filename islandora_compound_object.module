@@ -108,7 +108,7 @@ function islandora_compound_object_block_view($delta = '') {
 function islandora_compound_object_islandora_compoundcmodel_islandora_object_purged($pid) {
   $parts = islandora_compound_object_get_parts($pid);
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isPartOf');
-  foreach( $parts as $part) {
+  foreach ($parts as $part) {
     $escaped_pid = str_replace(':', '_', $pid);
     $child_object = islandora_object_load($part);
     $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $pid);
