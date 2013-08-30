@@ -11,7 +11,6 @@ function set_caption_timout() {
     function() {
       jQuery('.islandora-compound-thumb').each(
         function() {
-          console.log('asdf');
           image_width = jQuery(this).find('img').outerWidth();
           jQuery(this).css('max-width', image_width);
         }
