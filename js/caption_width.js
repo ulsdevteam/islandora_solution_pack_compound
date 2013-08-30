@@ -16,10 +16,10 @@ function set_caption_timout() {
         }
       );
     },
-    250
+    500
   );
 }
-jQuery(document).ready(
+jQuery(window).load(
   function() {
     window.resize_caption = set_caption_timout();
     jQuery(window).bind(
