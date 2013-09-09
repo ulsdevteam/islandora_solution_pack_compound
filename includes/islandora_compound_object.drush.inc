@@ -42,7 +42,6 @@ function islandora_compound_object_setup_batch() {
   // Update all compound object child relationships to use
   // isConstituentOf.
   module_load_include('inc', 'islandora', 'includes/utilities');
-  module_load_include('inc', 'islandora_compound_object', 'includes/manage.form');
 
   $tuque = islandora_get_tuque_connection();
   $query = 'select $object $label from <#ri> where (
