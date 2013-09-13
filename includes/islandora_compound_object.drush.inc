@@ -158,5 +158,5 @@ function islandora_compound_object_get_insert_sequence($children) {
 function islandora_compound_object_batch_update_rels_predicate_finished($success, $results, $operations) {
   // Print finished message to user.
   variable_set('islandora_compound_object_relationship', 'isConstituentOf');
-  print_r('Finished updating compound object relationship predicate(s).');
+  drush_print('Finished updating compound object relationship predicate(s).');
 }
