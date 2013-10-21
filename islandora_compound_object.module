@@ -279,26 +279,23 @@ function islandora_compound_object_access(AbstractObject $object) {
 function islandora_compound_object_update_parent_thumbnail($child, $parent) {
   $parts = islandora_compound_object_get_parts($parent->id);
 
-  // Child has just been added maybe? Can this be relied upon?
-  if (count($parts) == 1) {
-    $mime_detector = new MimeDetect();
-    $ext = $mime_detector->getExtension($child['TN']->mimeType);
-    $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
-    $child['TN']->getContent($file);
+  $mime_detector = new MimeDetect();
+  $ext = $mime_detector->getExtension($child['TN']->mimeType);
+  $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
+  $child['TN']->getContent($file);
 
-    if (empty($parent['TN'])) {
-      $ds = $parent->constructDatastream('TN', 'M');
-      $parent->ingestDatastream($ds);
-    }
-    else {
-      $ds = $parent['TN'];
-    }
-    $ds->setContentFromFile($file, TRUE);
-    $ds->label = 'Thumbnail';
-    $ds->mimetype = $mime_detector->getMimetype($file);
-
-    file_unmanaged_delete($file);
+  if (empty($parent['TN'])) {
+    $ds = $parent->constructDatastream('TN', 'M');
+    $parent->ingestDatastream($ds);
   }
+  else {
+    $ds = $parent['TN'];
+  }
+  $ds->setContentFromFile($file, TRUE);
+  $ds->label = 'Thumbnail';
+  $ds->mimetype = $mime_detector->getMimetype($file);
+
+  file_unmanaged_delete($file);
 }
 
 /**
