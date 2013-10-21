@@ -181,7 +181,6 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
   $create_thumbs = variable_get('islandora_compound_object_thumbnail_child', TRUE);
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
   // Relationship from child to this object.
-  dsm($form_state);
   if (!empty($form_state['values']['child'])) {
     $escaped_pid = str_replace(':', '_', $object->id);
     $child_object = islandora_object_load($form_state['values']['child']);
@@ -189,11 +188,12 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
     $insert_seq = islandora_compound_object_get_insert_sequence_number($children);
     $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $object->id);
     $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
-    dsm($form_state);
-    if ($create_thumbs && empty($form_state['values']['remove_children'])) {
-      islandora_compound_object_update_parent_thumbnail($child_object, $object);
+    if ($create_thumbs) {
+      islandora_compound_object_update_parent_thumbnail($object);
     }
   }
+  
+  
 
   // Add relationship to parent.
   if (!empty($form_state['values']['parent'])) {
@@ -203,7 +203,7 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
     $object->relationships->add('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $form_state['values']['parent']);
     $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
     if ($create_thumbs) {
-      islandora_compound_object_update_parent_thumbnail($object, islandora_object_load($form_state['values']['parent']));
+      islandora_compound_object_update_parent_thumbnail(islandora_object_load($form_state['values']['parent']));
     }
   }
 
@@ -218,6 +218,10 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
         $child_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
       }
     }
+    if ($create_thumbs) {
+      islandora_compound_object_update_parent_thumbnail($object);
+    }
+    
   }
 
   // Unlink parents.
@@ -228,6 +232,9 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
         $parent_object = islandora_object_load($parent);
         $escaped_pid = str_replace(':', '_', $object->id);
         $parent_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
+        if ($create_thumbs) {
+          islandora_compound_object_update_parent_thumbnail($parent);
+        }
       }
     }
   }
@@ -300,7 +307,7 @@ function islandora_compound_object_sequence_submit($form, &$form_state) {
     if ($create_thumbs) {
       $child_arr = array_peek($form_state['values']['table']['table']['rows']);
       $child = islandora_object_load($child_arr[0]);
-      islandora_compound_object_update_parent_thumbnail($child,$object);
+      islandora_compound_object_update_parent_thumbnail($object);
     }
   }
 }
