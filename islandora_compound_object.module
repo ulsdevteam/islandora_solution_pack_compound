@@ -276,9 +276,11 @@ function islandora_compound_object_access(AbstractObject $object) {
 /**
  * Replaces parent object thumbnail with child's thumbnail.
  */
-function islandora_compound_object_update_parent_thumbnail($child, $parent) {
+function islandora_compound_object_update_parent_thumbnail($parent) {
   $parts = islandora_compound_object_get_parts($parent->id);
-
+  dsm($parts);
+  if(!empty($parts)){
+  $child = islandora_object_load($parts[0]);
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($child['TN']->mimeType);
   $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
@@ -296,6 +298,7 @@ function islandora_compound_object_update_parent_thumbnail($child, $parent) {
   $ds->mimetype = $mime_detector->getMimetype($file);
 
   file_unmanaged_delete($file);
+  }
 }
 
 /**
