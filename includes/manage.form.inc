@@ -181,6 +181,7 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
   $create_thumbs = variable_get('islandora_compound_object_thumbnail_child', TRUE);
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
   // Relationship from child to this object.
+  dsm($form_state);
   if (!empty($form_state['values']['child'])) {
     $escaped_pid = str_replace(':', '_', $object->id);
     $child_object = islandora_object_load($form_state['values']['child']);
@@ -188,7 +189,8 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
     $insert_seq = islandora_compound_object_get_insert_sequence_number($children);
     $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $object->id);
     $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
-    if ($create_thumbs) {
+    dsm($form_state);
+    if ($create_thumbs && empty($form_state['values']['remove_children'])) {
       islandora_compound_object_update_parent_thumbnail($child_object, $object);
     }
   }
@@ -294,6 +296,12 @@ function islandora_compound_object_sequence_submit($form, &$form_state) {
   if ($compounds) {
     uasort($compounds, 'drupal_sort_weight');
     islandora_compound_object_sequence_batch($object->id, $compounds);
+    $create_thumbs = variable_get('islandora_compound_object_thumbnail_child', TRUE);
+    if ($create_thumbs) {
+      $child_arr = array_peek($form_state['values']['table']['table']['rows']);
+      $child = islandora_object_load($child_arr[0]);
+      islandora_compound_object_update_parent_thumbnail($child,$object);
+    }
   }
 }
 
