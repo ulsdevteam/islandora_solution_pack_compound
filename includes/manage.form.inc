@@ -192,8 +192,6 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
       islandora_compound_object_update_parent_thumbnail($object);
     }
   }
-  
-  
 
   // Add relationship to parent.
   if (!empty($form_state['values']['parent'])) {
@@ -221,7 +219,6 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
     if ($create_thumbs) {
       islandora_compound_object_update_parent_thumbnail($object);
     }
-    
   }
 
   // Unlink parents.
@@ -303,12 +300,6 @@ function islandora_compound_object_sequence_submit($form, &$form_state) {
   if ($compounds) {
     uasort($compounds, 'drupal_sort_weight');
     islandora_compound_object_sequence_batch($object->id, $compounds);
-    $create_thumbs = variable_get('islandora_compound_object_thumbnail_child', TRUE);
-    if ($create_thumbs) {
-      $child_arr = array_peek($form_state['values']['table']['table']['rows']);
-      $child = islandora_object_load($child_arr[0]);
-      islandora_compound_object_update_parent_thumbnail($object);
-    }
   }
 }
 
@@ -341,6 +332,19 @@ function islandora_compound_object_sequence_batch($pid, array $compounds) {
 }
 
 /**
+ * To change the thumbnail after update sequence.
+ * 
+ * @param string $parent
+ *   The parent pid.
+ */
+function islandora_compound_object_change_thumbnail($parent) {
+  $create_thumbs = variable_get('islandora_compound_object_thumbnail_child', TRUE);
+  if ($create_thumbs) {
+    islandora_compound_object_update_parent_thumbnail(islandora_object_load($parent));
+  }
+}
+
+/**
  * Builds up a sequence of operations for sequence numbering.
  *
  * @param string $parent_pid
@@ -364,6 +368,11 @@ function islandora_compound_object_build_sequence_operations($parent_pid, $compo
     );
     $start_seq++;
   }
+  $operations[] = array(
+    'islandora_compound_object_change_thumbnail', array(
+      $parent_pid,
+    ),
+  );
   return $operations;
 }
 

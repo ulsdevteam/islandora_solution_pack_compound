@@ -7,6 +7,7 @@
  *
  * Hook implementations and general functions.
  */
+
 define('ISLANDORA_COMPOUND_OBJECT_CMODEL', 'islandora:compoundCModel');
 
 /**
@@ -373,19 +374,19 @@ EOQ;
 
     // Sort the objects into their proper order.
     $sort = function($a, $b) {
-          $a = $a['seq']['value'];
-          $b = $b['seq']['value'];
-          if ($a === $b) {
-            return 0;
-          }
-          if (empty($a)) {
-            return 1;
-          }
-          if (empty($b)) {
-            return -1;
-          }
-          return $a - $b;
-        };
+      $a = $a['seq']['value'];
+      $b = $b['seq']['value'];
+      if ($a === $b) {
+        return 0;
+      }
+      if (empty($a)) {
+        return 1;
+      }
+      if (empty($b)) {
+        return -1;
+      }
+      return $a - $b;
+    };
     uasort($results, $sort);
 
     foreach ($results as $result) {
