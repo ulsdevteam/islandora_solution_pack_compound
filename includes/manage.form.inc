@@ -230,7 +230,7 @@ function islandora_compound_object_manage_form_submit($form, &$form_state) {
         $escaped_pid = str_replace(':', '_', $object->id);
         $parent_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
         if ($create_thumbs) {
-          islandora_compound_object_update_parent_thumbnail($parent);
+          islandora_compound_object_update_parent_thumbnail($parent_object);
         }
       }
     }

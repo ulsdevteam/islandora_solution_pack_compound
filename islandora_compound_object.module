@@ -284,7 +284,6 @@ function islandora_compound_object_update_parent_thumbnail($parent) {
     $ext = $mime_detector->getExtension($child['TN']->mimeType);
     $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
     $child['TN']->getContent($file);
-
     if (empty($parent['TN'])) {
       $ds = $parent->constructDatastream('TN', 'M');
       $parent->ingestDatastream($ds);
@@ -298,7 +297,7 @@ function islandora_compound_object_update_parent_thumbnail($parent) {
 
     file_unmanaged_delete($file);
   }
-  else {
+  elseif ($parent['TN']) {
     $parent->purgeDatastream('TN');
   }
 }
