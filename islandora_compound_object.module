@@ -115,6 +115,7 @@ function islandora_compound_object_islandora_compoundcmodel_islandora_object_pur
     $child_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
   }
 }
+
 /**
  * Implements hook_islandora_required_objects().
  */
@@ -222,23 +223,22 @@ function islandora_compound_object_navigation_block() {
 
           // Check if perms to show link for parent manage.
           if (islandora_object_manage_access_callback(array(
-            ISLANDORA_METADATA_EDIT, ISLANDORA_MANAGE_PROPERTIES, ISLANDORA_ADD_DS), $parent)) {
+                ISLANDORA_METADATA_EDIT, ISLANDORA_MANAGE_PROPERTIES, ISLANDORA_ADD_DS), $parent)) {
             $parent_url = 'islandora/object/' . $parent_pid . '/manage';
           }
           else {
             $parent_url = FALSE;
           }
 
-          $prev_next = theme('islandora_compound_prev_next',
-            array(
-              'parent_label' => $parent->label,
-              'parent_url' => $parent_url,
-              'previous_pid' => $previous_pid,
-              'next_pid' => $next_pid,
-              'child_count' => count($siblings),
-              'siblings' => $siblings,
-              'pid' => $pid,
-            ));
+          $prev_next = theme('islandora_compound_prev_next', array(
+            'parent_label' => $parent->label,
+            'parent_url' => $parent_url,
+            'previous_pid' => $previous_pid,
+            'next_pid' => $next_pid,
+            'child_count' => count($siblings),
+            'siblings' => $siblings,
+            'pid' => $pid,
+          ));
 
           $output .= $prev_next;
         }
@@ -276,16 +276,14 @@ function islandora_compound_object_access(AbstractObject $object) {
 /**
  * Replaces parent object thumbnail with child's thumbnail.
  */
-function islandora_compound_object_update_parent_thumbnail($child, $parent) {
+function islandora_compound_object_update_parent_thumbnail($parent) {
   $parts = islandora_compound_object_get_parts($parent->id);
-
-  // Child has just been added maybe? Can this be relied upon?
-  if (count($parts) == 1) {
+  if (!empty($parts)) {
+    $child = islandora_object_load($parts[0]);
     $mime_detector = new MimeDetect();
     $ext = $mime_detector->getExtension($child['TN']->mimeType);
     $file = drupal_realpath('temporary://{$child->id}_TN.{$ext}');
     $child['TN']->getContent($file);
-
     if (empty($parent['TN'])) {
       $ds = $parent->constructDatastream('TN', 'M');
       $parent->ingestDatastream($ds);
@@ -298,6 +296,9 @@ function islandora_compound_object_update_parent_thumbnail($child, $parent) {
     $ds->mimetype = $mime_detector->getMimetype($file);
 
     file_unmanaged_delete($file);
+  }
+  elseif (isset($parent['TN'])) {
+    $parent->purgeDatastream('TN');
   }
 }
 
