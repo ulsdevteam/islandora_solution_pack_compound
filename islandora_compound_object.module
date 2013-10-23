@@ -297,7 +297,7 @@ function islandora_compound_object_update_parent_thumbnail($parent) {
 
     file_unmanaged_delete($file);
   }
-  elseif ($parent['TN']) {
+  elseif (isset($parent['TN'])) {
     $parent->purgeDatastream('TN');
   }
 }
