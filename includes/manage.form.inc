@@ -132,7 +132,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
         $compound = TRUE;
       }
     }
-    if ($compound) {
+    if (!$compound) {
       form_set_error('child', t('This object is not a compound object'));
     }
     if (!islandora_is_valid_pid($form_state['values']['child'])) {
