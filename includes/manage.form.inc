@@ -32,7 +32,7 @@ function islandora_compound_object_manage_form($form, &$form_state, $object) {
     $form['add_children']['child'] = array(
       '#type' => 'textfield',
       '#title' => t('Child Object Pid/Label'),
-      '#autocomplete_path' => 'islandora_compound_object/autocomplete',
+      '#autocomplete_path' => 'islandora_compound_object/autocomplete/child',
     );
 
     // Remove children.
@@ -73,7 +73,7 @@ function islandora_compound_object_manage_form($form, &$form_state, $object) {
   $form['add_to_parent']['parent'] = array(
     '#type' => 'textfield',
     '#title' => t('Parent Object Pid/Label'),
-    '#autocomplete_path' => 'islandora_compound_object/autocomplete',
+    '#autocomplete_path' => 'islandora_compound_object/autocomplete/parent',
   );
 
   // Remove parents.
@@ -156,21 +156,22 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
 
   // Parent.
   if (!empty($form_state['values']['parent'])) {
-    $parent = islandora_object_load($form_state['values']['parent']);
-    $compound = FALSE;
-    foreach ($parent->models as $value) {
-      if ($value == "islandora:compoundCModel") {
-        $compound = TRUE;
-      }
-    }
-    if (!$compound) {
-      form_set_error('parent', t('The parent object is not a compound object'));
-    }
     // Check if valid parent pid.
     if (!islandora_is_valid_pid($form_state['values']['parent'])) {
       form_set_error('parent', t('Invalid object supplied.'));
     }
-
+    elseif (variable_get('islandora_compound_object_compound_children', TRUE)) {
+      $parent = islandora_object_load($form_state['values']['parent']);
+      $compound = FALSE;
+      foreach ($parent->models as $value) {
+        if ($value == "islandora:compoundCModel") {
+          $compound = TRUE;
+        }
+      }
+      if (!$compound) {
+        form_set_error('parent', t('The parent object (@pid) is not a compound object!', array('@pid' => $form_state['values']['parent'])));
+      }
+    }
     // Do not allow parent of self.
     if ($form_state['values']['parent'] == $object->id) {
       form_set_error('parent', t('An object may not be the parent of itself.'));
@@ -351,7 +352,7 @@ function islandora_compound_object_sequence_batch($pid, array $compounds) {
 
 /**
  * To change the thumbnail after update sequence.
- * 
+ *
  * @param string $parent
  *   The parent pid.
  */
