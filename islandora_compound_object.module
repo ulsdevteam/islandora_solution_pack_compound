@@ -34,7 +34,7 @@ function islandora_compound_object_menu() {
   );
   $items['islandora_compound_object/autocomplete/child'] = array(
     'page callback' => 'islandora_compound_object_autocomplete',
-    'page arguments' => array(3),
+    'page arguments' => array(3, FALSE),
     'access arguments' => array('administer compound relationships'),
     'type' => MENU_CALLBACK,
   );
