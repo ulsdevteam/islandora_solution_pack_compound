@@ -32,7 +32,7 @@ function theme_islandora_compound_prev_next($variables) {
     $output .= l(t('Next'), 'islandora/object/' . $variables['next_pid']);
   }
 
-  if ($variables['child_count'] > 1) {
+  if ($variables['child_count'] > 0) {
     $output .= '<div class="islandora-compound-thumbs">';
     for ($i = 0; $i < count($variables['siblings']); $i++) {
       $output .= '<div class="islandora-compound-thumb">';
