@@ -32,9 +32,15 @@ function islandora_compound_object_menu() {
     'file' => 'includes/manage.form.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  $items['islandora_compound_object/autocomplete'] = array(
-    'page callback' => 'islandora_compound_object_autocomplete_child',
-    'page arguments' => array(2),
+  $items['islandora_compound_object/autocomplete/child'] = array(
+    'page callback' => 'islandora_compound_object_autocomplete',
+    'page arguments' => array(3),
+    'access arguments' => array('administer compound relationships'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['islandora_compound_object/autocomplete/parent'] = array(
+    'page callback' => 'islandora_compound_object_autocomplete',
+    'page arguments' => array(3, TRUE),
     'access arguments' => array('administer compound relationships'),
     'type' => MENU_CALLBACK,
   );
@@ -303,25 +309,53 @@ function islandora_compound_object_update_parent_thumbnail($parent) {
 }
 
 /**
- * Autocomplete callback for object search.
+ * Autocomplete callback for child object search.
+ *
+ * @string string $string
+ *   The user supplied string that is being searched for.
  */
-function islandora_compound_object_autocomplete_child($string) {
+function islandora_compound_object_autocomplete($string, $parent = FALSE) {
   $matches = array();
-  $islandora_tuque = new IslandoraTuque();
-  $results = $islandora_tuque->api->a->findObjects('terms', '*' . $string . '*', 10);
+  $islandora_tuque = islandora_get_tuque_connection();
+  $compound_enforcement = variable_get('islandora_compound_object_compound_children', TRUE);
 
-  foreach ($results['results'] as $result) {
-    // Empty array elements getting sent through.
-    if (is_array($result['title'])) {
-      $title = $result['title'][0];
+  if ($compound_enforcement && $parent) {
+    $parent_query = <<<EOQ
+SELECT ?pid ?title FROM <#ri>
+WHERE {
+  ?pid <fedora-model:hasModel> <info:fedora/islandora:compoundCModel> ;
+       <fedora-model:label> ?title
+}
+EOQ;
+    $results = $islandora_tuque->repository->ri->sparqlQuery($parent_query, 'unlimited');
+  }
+  else {
+    $results = $islandora_tuque->api->a->findObjects('terms', '*' . $string . '*', 10);
+  }
+
+  // Need to parse results differently for the SPARQL query versus findObjects.
+  if ($compound_enforcement && $parent) {
+    foreach ($results as $result) {
+      if (strpos(drupal_strtoupper($result['title']['value']), drupal_strtoupper($string)) !== FALSE) {
+        $matches[$result['pid']['value']] = $result['title']['value'] . ' (' . $result['pid']['value'] . ')';
+      }
     }
-    else {
-      $title = $result['title'];
+  }
+  else {
+    foreach ($results['results'] as $result) {
+      // Empty array elements getting sent through.
+      if (is_array($result['title'])) {
+        $title = $result['title'][0];
+      }
+      else {
+        $title = $result['title'];
+      }
+      $matches[$result['pid']] = $title . ' (' . $result['pid'] . ')';
     }
-    $matches[$result['pid']] = $title . ' (' . $result['pid'] . ')';
   }
   drupal_json_output($matches);
 }
+
 
 /**
  * Implements hook_islandora_basic_collection_get_query_statements().
