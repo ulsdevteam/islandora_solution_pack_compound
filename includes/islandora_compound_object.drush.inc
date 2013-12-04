@@ -76,7 +76,7 @@ function islandora_compound_object_setup_batch() {
 
   // Get the batch process set up.
   batch_set($batch);
-  $batch =& batch_get();
+  $batch = & batch_get();
   $batch['progressive'] = FALSE;
   drush_backend_batch_process();
 }
@@ -98,8 +98,15 @@ function islandora_compound_object_batch_set_rels_predicate($compound_object, $o
   foreach ($parts as $part) {
     $escaped_pid = str_replace(':', '_', $compound_object);
     $child_object = islandora_object_load($part);
-    $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isConstituentOf', $compound_object);
-    $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
+    $rels = $child_object->relationships->get('info:fedora/fedora-system:def/relations-external#', 'isConstituentOf', $compound_object);
+    if (count($rels) == 0) {
+      $child_object->relationships->add('info:fedora/fedora-system:def/relations-external#', 'isConstituentOf', $compound_object);
+    }
+
+    $rels = $child_object->relationships->get(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
+    if (count($rels) == 0) {
+      $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
+    }
   }
 }
 
@@ -120,7 +127,6 @@ function islandora_compound_object_batch_delete_rels_predicate($compound_object,
     $escaped_pid = str_replace(':', '_', $compound_object);
     $child_object = islandora_object_load($part);
     $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', 'isPartOf', $compound_object);
-    $child_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
   }
 }
 
