@@ -289,7 +289,7 @@ function islandora_compound_object_update_parent_thumbnail($parent) {
     $mime_detector = new MimeDetect();
     $ext = $mime_detector->getExtension($child['TN']->mimeType);
     // slangerx: For some reason, complex syntax {$...} sometimes doesn't get
-    // processed, resulting in error messages like: "The file {$child->id}_TN.{$ext}
+    // processed, causing error messages like: "The file {$child->id}_TN.{$ext}
     // cannot be found." Concatenating the variables seemed to fix this problem.
     $file = drupal_realpath('temporary://' . $child->id . '_TN.' . $ext);
     $child['TN']->getContent($file);
