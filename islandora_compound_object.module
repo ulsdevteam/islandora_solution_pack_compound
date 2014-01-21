@@ -362,7 +362,8 @@ EOQ;
  */
 function islandora_compound_object_islandora_basic_collection_get_query_statements($type) {
   if ($type == 'view') {
-    return 'OPTIONAL {?object <fedora-rels-ext:isConstituentOf> ?compound . }';
+    $relationship = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
+    return "OPTIONAL {?object <fedora-rels-ext:$relationship> ?compound . }";
   }
 }
 
