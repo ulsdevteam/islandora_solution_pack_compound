@@ -360,15 +360,20 @@ EOQ;
 /**
  * Implements hook_islandora_basic_collection_get_query_statements().
  */
-function islandora_compound_object_islandora_basic_collection_get_query_statements() {
-  return 'OPTIONAL {?object <fedora-rels-ext:isConstituentOf> ?compound . }';
+function islandora_compound_object_islandora_basic_collection_get_query_statements($type) {
+  if ($type == 'view') {
+    $relationship = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
+    return "OPTIONAL {?object <fedora-rels-ext:$relationship> ?compound . }";
+  }
 }
 
 /**
  * Implements hook_islandora_basic_collection_get_query_filters().
  */
-function islandora_compound_object_islandora_basic_collection_get_query_filters() {
-  return '!bound(?compound)';
+function islandora_compound_object_islandora_basic_collection_get_query_filters($type) {
+  if ($type == 'view') {
+    return '!bound(?compound)';
+  }
 }
 
 /**
