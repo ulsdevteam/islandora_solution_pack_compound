@@ -59,4 +59,3 @@
    </div> <!-- // islandora-compound-thumbs -->
  <?php endif; // count($themed_siblings) > 0 ?>
  </div>
- 
