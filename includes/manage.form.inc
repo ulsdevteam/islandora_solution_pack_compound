@@ -325,7 +325,7 @@ function islandora_compound_object_sequence_batch($pid, array $compounds) {
     'operations' => $operations,
     'title' => t("Sequencing @label's compound objects ...", array('@label' => $object->label)),
     'init_message' => t("Preparing to sequence @label's child objects ...", array('@label' => $object->label)),
-    'progress_message' => t('Time elapsed: @elapsed <br/>Estimated time remaning @estimate.'),
+    'progress_message' => t('Time elapsed: @elapsed <br/>Estimated time remaining @estimate.'),
     'error_message' => t('An error has occurred.'),
     'file' => drupal_get_path('module', 'islandora_compound_object') . '/includes/manage.form.inc',
   );
