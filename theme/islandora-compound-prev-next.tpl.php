@@ -11,7 +11,13 @@
  * $previous_pid - PID of previous object in sequence or blank if on first
  * $next_pid - PID of next object in sequence or blank if on last
  * $siblings - array of PIDs of sibling objects in compound 
- * $folder_image_path - path to default folder image for missing/restricted thumbnails
+ * $themed_siblings - array of siblings of model
+ *    array(
+ *      'pid' => PID of sibling,
+ *      'label' => label of sibling,
+ *      'TN' => URL of thumbnail or default folder if no datastream,
+ *      'class' => array of classes for this sibling,
+ *    )
  */
  
 ?>
@@ -49,7 +55,7 @@
        array('html' => TRUE)
      );?>
      </div>
-   <?php endfor; // each themed_siblings ?>
-   </div> <!-- /islandora-compound-thumbs -->
+   <?php endforeach; // each themed_siblings ?>
+   </div> <!-- // islandora-compound-thumbs -->
  <?php endif; // count($themed_siblings) > 0 ?>
  </div>
