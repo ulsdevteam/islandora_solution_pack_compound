@@ -77,6 +77,37 @@ function theme_islandora_compound_prev_next($variables) {
   return $output;
 }
 
+function islandora_compound_object_preprocess_islandora_compound_object_prev_next(array &$variables) {
+  drupal_add_js(drupal_get_path('module', 'islandora_compound_object') . '/js/caption_width.js');
+  
+  $themed_siblings = array();
+  
+  $image_path = drupal_get_path('module', 'islandora');
+  $folder_image_path = "$image_path/images/folder.png";
+  if ($variables['child_count'] > 1) {
+    for ($i = 0; $i < count($variables['siblings']); $i += 1) {
+      $sibling = array();
+      $sibling['pid'] = $variables['siblings'][$i];
+      if ($sibling['pid'] === $variables['pid']) {
+        $sibling['class'] = array('active');
+      }
+      $sibling_object = islandora_object_load($sibling['pid']);
+      if (isset($sibling_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $sibling_object['TN'])) {
+        $sibling['TN'] = 'islandora/object/' . $sibling['pid'] . '/datastream/TN/view';
+      } else {
+        // Object either does not have a thumbnail or it's restricted show a
+        // default in its place.
+        $sibling['TN'] = $folder_image_path;
+      }
+      $sibling['label'] = $sibling_object->label;
+      $themed_siblings[] = $sibling;
+    }
+  }
+  $variables['themed_siblings'] = $themed_siblings;
+  
+}
+
+
 /**
  * Implements theme_element().
  */
