@@ -363,12 +363,14 @@ EOQ;
 
 
 /**
- * Implements hook_islandora_basic_collection_get_query_statements().
+ * Implements hook_islandora_basic_collection_get_query_optionals().
  */
-function islandora_compound_object_islandora_basic_collection_get_query_statements($type) {
+function islandora_compound_object_islandora_basic_collection_get_query_optionals($type) {
   if ($type == 'view') {
-    $relationship = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
-    return "OPTIONAL {?object <fedora-rels-ext:$relationship> ?compound . }";
+    return format_string('?object <!uri!pred> ?compound', array(
+      '!uri' => FEDORA_RELS_EXT_URI,
+      '!pred' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'),
+    ));
   }
 }
 
