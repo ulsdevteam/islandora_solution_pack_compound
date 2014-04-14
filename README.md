@@ -38,7 +38,7 @@ Navigation" block at /admin/structure/block.
 CONFIGURATION
 -------------
 
-The module has documented configuration options at admin/islandora/compound_object.
+The module has documented configuration options at admin/islandora/solution_pack_config/compound_object.
 
 CUSTOMIZATION
 -------------
@@ -49,5 +49,5 @@ DRUSH
 -------------
 
 A Drush command has been added, to be run from the command line (Terminal), that will update the existing rel-predicate of
-existing compound objects to 'isConstituentOf'. It can be run with the drush command 'drush update_rels_predicate'. This command 
+existing compound objects to 'isConstituentOf'. It can be run with the drush command 'drush update_rels_predicate'. This command
 accpets no arguments.
