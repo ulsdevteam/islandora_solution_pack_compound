@@ -1,4 +1,4 @@
-# Compound Solution Pack [![Build Status](https://travis-ci.org/Islandora/islandora_solution_pack_compound.png?branch=7.x)](https://travis-ci.org/Islandora/islandora_solution_pack_compound)
+# Compound Object Solution Pack [![Build Status](https://travis-ci.org/Islandora/islandora_solution_pack_compound.png?branch=7.x)](https://travis-ci.org/Islandora/islandora_solution_pack_compound)
 
 ## Introduction
 
@@ -11,9 +11,9 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 ## Configuration
 
-Set the 'Child releationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Compound objects (admin/islandora/compound_object).
+Set the 'Child releationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
 
-![Configuration](http://i.imgur.com/gX9KHuM.png)
+![Configuration](https://camo.githubusercontent.com/6862e3106b3ec20c7ad08ec8334f521a569e8bff/687474703a2f2f692e696d6775722e636f6d2f6758394b48754d2e706e67)
 
 **Block**:
 
@@ -21,7 +21,7 @@ Enable the module and if the navigation controls are desired, enable and configu
 
 **Theme**:
 
-The "Islandora Compound Object Navigation" block can be themed. See theme_islandora_compound_prev_next().
+The "Islandora Compound Object Navigation" block can be themed. See `theme_islandora_compound_prev_next()`.
 
 **Drush**:
 
