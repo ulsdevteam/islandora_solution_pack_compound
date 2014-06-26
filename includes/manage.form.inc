@@ -109,7 +109,7 @@ function islandora_compound_object_manage_form($form, &$form_state, $object) {
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Submit'),
+    '#value' => t('Save'),
   );
 
   return $form;
