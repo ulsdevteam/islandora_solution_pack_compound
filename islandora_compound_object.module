@@ -526,53 +526,55 @@ function islandora_compound_object_menu_local_tasks_alter(&$data, $router_item, 
           '@child' => $compound_info['label'],
         )));
       }
-      foreach ($data['tabs'][0]['output'] as $key => &$tab) {
-        if ($tab['#link']['path'] == 'islandora/object/%/compound_count') {
-          if (in_array($root_path, $valid_paths) && !empty($compound_info)) {
-            $tab['#theme'] = 'html_tag';
-            $tab['#tag'] = 'span';
-            $tab['#attributes'] = array(
-              'id' => 'islandora-compound-sequence-position',
-            );
-            $tab['#value'] = t('@seq of @total', array(
-              '@seq' => $compound_info['sequence'],
-              '@total' => $compound_info['child_count'],
-            ));
+      if (isset($data['tabs'][0]['output'])) {
+        foreach ($data['tabs'][0]['output'] as $key => &$tab) {
+          if ($tab['#link']['path'] == 'islandora/object/%/compound_count') {
+            if (in_array($root_path, $valid_paths) && !empty($compound_info)) {
+              $tab['#theme'] = 'html_tag';
+              $tab['#tag'] = 'span';
+              $tab['#attributes'] = array(
+                'id' => 'islandora-compound-sequence-position',
+              );
+              $tab['#value'] = t('@seq of @total', array(
+                '@seq' => $compound_info['sequence'],
+                '@total' => $compound_info['child_count'],
+              ));
+            }
+            else {
+              unset($data['tabs'][0]['output'][$key]);
+            }
           }
-          else {
-            unset($data['tabs'][0]['output'][$key]);
+          elseif ($tab['#link']['path'] == 'islandora/object/%/compound_previous') {
+            if (in_array($root_path, $valid_paths) && !empty($compound_info['previous_pid'])) {
+              $tab['#theme'] = 'link';
+              $tab['#text'] = t('Previous');
+              $tab['#path'] = "islandora/object/{$compound_info['previous_pid']}";
+              $tab['#options'] = array(
+                'attributes' => array(
+                  'id' => 'islandora-compound-previous-link',
+                ),
+                'html' => FALSE,
+              );
+            }
+            else {
+              unset($data['tabs'][0]['output'][$key]);
+            }
           }
-        }
-        elseif ($tab['#link']['path'] == 'islandora/object/%/compound_previous') {
-          if (in_array($root_path, $valid_paths) && !empty($compound_info['previous_pid'])) {
-            $tab['#theme'] = 'link';
-            $tab['#text'] = t('Previous');
-            $tab['#path'] = "islandora/object/{$compound_info['previous_pid']}";
-            $tab['#options'] = array(
-              'attributes' => array(
-                'id' => 'islandora-compound-previous-link',
-              ),
-              'html' => FALSE,
-            );
-          }
-          else {
-            unset($data['tabs'][0]['output'][$key]);
-          }
-        }
-        elseif ($tab['#link']['path'] == 'islandora/object/%/compound_next') {
-          if (in_array($root_path, $valid_paths) && !empty($compound_info['next_pid'])) {
-            $tab['#theme'] = 'link';
-            $tab['#text'] = t('Next');
-            $tab['#path'] = "islandora/object/{$compound_info['next_pid']}";
-            $tab['#options'] = array(
-              'attributes' => array(
-                'id' => 'islandora-compound-next-link',
-              ),
-              'html' => FALSE,
-            );
-          }
-          else {
-            unset($data['tabs'][0]['output'][$key]);
+          elseif ($tab['#link']['path'] == 'islandora/object/%/compound_next') {
+            if (in_array($root_path, $valid_paths) && !empty($compound_info['next_pid'])) {
+              $tab['#theme'] = 'link';
+              $tab['#text'] = t('Next');
+              $tab['#path'] = "islandora/object/{$compound_info['next_pid']}";
+              $tab['#options'] = array(
+                'attributes' => array(
+                  'id' => 'islandora-compound-next-link',
+                ),
+                'html' => FALSE,
+              );
+            }
+            else {
+              unset($data['tabs'][0]['output'][$key]);
+            }
           }
         }
       }
