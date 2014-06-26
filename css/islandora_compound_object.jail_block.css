@@ -13,3 +13,15 @@
 html:not(.js) #block-islandora-compound-object-compound-jail-display img.islandora-compound-object-jail {
     display: none;
 }
+
+/* Tabs Controls */
+
+.tabs.primary > a {
+  float: left;
+}
+
+#islandora-compound-sequence-position, #islandora-compound-previous-link, #islandora-compound-next-link {
+	float: right;
+	line-height: 2.5em;
+	padding: 0 0.15em;
+}

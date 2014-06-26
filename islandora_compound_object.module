@@ -47,7 +47,7 @@ function islandora_compound_object_menu() {
   );
   $items['islandora/object/%islandora_object/compound_count'] = array(
     'title' => 'Compound Object Count',
-    'weight' => 21,
+    'weight' => 23,
     'page callback' => TRUE,
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'islandora_compound_object_task_access',
@@ -63,7 +63,7 @@ function islandora_compound_object_menu() {
   );
   $items['islandora/object/%islandora_object/compound_next'] = array(
     'title' => 'Compound Next',
-    'weight' => 23,
+    'weight' => 21,
     'page callback' => TRUE,
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'islandora_compound_object_task_access',
