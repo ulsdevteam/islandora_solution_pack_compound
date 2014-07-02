@@ -1,13 +1,23 @@
 #block-islandora-compound-object-compound-jail-display {
     float: right;
-    max-height: 400px;
+    height: 600px;
+    min-height: 400px;
     max-width: 20%;
     overflow-y: scroll;
     overflow-x: hidden;
+    font-size: 90%;
 }
 
 #block-islandora-compound-object-compound-jail-display img {
     width: 100%;
+    margin-bottom: 0.5em;
+}
+#block-islandora-compound-object-compound-jail-display .form-type-item:first-child {
+	margin: 0;
+}
+#block-islandora-compound-object-compound-jail-display .form-type-item:nth-child(2) {
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 0.5em;
 }
 
 html:not(.js) #block-islandora-compound-object-compound-jail-display img.islandora-compound-object-jail {
@@ -26,7 +36,17 @@ html:not(.js) #block-islandora-compound-object-compound-jail-display img.islando
 	padding: 0 0.15em;
 }
 
+/* Solution Pack Overrides */
+
+a.islandora-pdf-link {
+  clear: both;
+  float: left;
+  margin: 5px 0 0 5px;
+}
+
+/*
 .islandora-large-image-object.islandora {
   float: left;
   width: 78%;
 }
+*/
