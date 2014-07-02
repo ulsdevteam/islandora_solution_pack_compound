@@ -25,3 +25,8 @@ html:not(.js) #block-islandora-compound-object-compound-jail-display img.islando
 	line-height: 2.5em;
 	padding: 0 0.15em;
 }
+
+.islandora-large-image-object.islandora {
+  float: left;
+  width: 78%;
+}
