@@ -14,17 +14,16 @@
     display: inline-block;
     max-width: 20%;
     vertical-align: top;
+    line-height: 1.25em;
 }
 #block-islandora-compound-object-compound-jail-display .content img {
-    margin-right: 0.5em;
-    margin-bottom: 0.5em;
+    margin: 0.5em 0.5em 1em 0;
     max-width: 70%;
 }
 
 /* Display in Sidebar Region */
 
 .sidebar #block-islandora-compound-object-compound-jail-display {
-  float: none;
   height: 700px;
   width: auto;
   min-height: 400px;
@@ -32,6 +31,11 @@
 .sidebar #block-islandora-compound-object-compound-jail-display .content img {
     margin-right: 0;
     width: 100%;
+    max-width: 85%;
+}
+.sidebar #block-islandora-compound-object-compound-jail-display .content a {
+    display: inline-block;
+    max-width: 100%;
 }
 
 /* Shared */
