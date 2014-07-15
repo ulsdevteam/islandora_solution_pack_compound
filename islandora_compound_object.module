@@ -505,7 +505,7 @@ WHERE {
           <fedora-rels-ext:$rels_predicate> <info:fedora/{$object->id}>
 }
 EOQ;
-  return $object->repository->ri->countQuery($query, 'sparql');
+  return $object->repository->ri->countQuery($query, 'sparql') > 0;
 }
 
 /**
