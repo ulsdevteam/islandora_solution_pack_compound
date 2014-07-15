@@ -41,6 +41,34 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#description' => t('Filter compound object children from Solr results.'),
     '#default_value' => variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:*'),
   );
-
+  $form['islandora_compound_object_use_jail_view'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use alternative, autoloading display for compounds?'),
+    '#description' => t('<b>Requires</b> <a href="@url">JAIL</a> library to be present.', array(
+      '@url' => url('https://github.com/sebarmeli/JAIL', array('absolute' => TRUE)),
+    )),
+    '#default_value' => variable_get('islandora_compound_object_use_jail_view', FALSE),
+    '#element_validate' => array('islandora_compound_object_admin_form_jail_validation'),
+  );
   return system_settings_form($form);
+}
+
+/**
+ * Check if the JAIL is available.
+ *
+ * @param array $element
+ *   The element to check.
+ * @param array $form_state
+ *   The Drupal form state.
+ * @param array $form
+ *   The Drupal form definition.
+ */
+function islandora_compound_object_admin_form_jail_validation(array $element, array &$form_state, array $form) {
+  if ($element['#value'] == 1 && !libraries_get_path('JAIL')) {
+    $element['#value'] = 0;
+    form_set_value($element, $element['#value'], $form_state);
+    drupal_set_message(t('The <a href="@url">JAIL</a> library must be present in the libraries folder to use this display.', array(
+      '@url' => url('https://github.com/sebarmeli/JAIL', array('absolute' => TRUE)),
+    )), 'error');
+  }
 }
