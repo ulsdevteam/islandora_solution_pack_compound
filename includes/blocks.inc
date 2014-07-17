@@ -40,7 +40,7 @@ function islandora_compound_object_jail_display_block() {
       $block['part_title'] = array(
         '#type' => 'item',
         '#markup' => t('Part of: @label (@count @obj)', array(
-          '@label' => $compound_object->label,
+          '@label' => $compound_info['parent_label'],
           '@count' => $compound_info['child_count'],
           '@obj' => format_plural($compound_info['child_count'], 'object', 'objects'),
         )),
