@@ -74,3 +74,7 @@ a.islandora-pdf-link {
   float: left;
   margin: 5px 0 0 5px;
 }
+
+.islandora-compound-object-jail-active{
+    border:0.3em solid;
+}
