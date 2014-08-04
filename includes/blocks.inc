@@ -62,6 +62,12 @@ function islandora_compound_object_jail_display_block() {
           $image_path = drupal_get_path('module', 'islandora');
           $path = "$image_path/images/folder.png";
         }
+        $class = array(
+          'islandora-compound-object-jail',
+        );
+        if ($sibling == $pid) {
+          $class[] = 'islandora-compound-object-jail-active';
+        }
         $img = array(
           'title' => array(
             '#markup' => $sibling_object->label,
@@ -70,9 +76,7 @@ function islandora_compound_object_jail_display_block() {
             '#theme' => 'image',
             '#path' => "$module_path/images/loader.png",
             '#attributes' => array(
-              'class' => array(
-                'islandora-compound-object-jail',
-              ),
+              'class' => $class,
               'data-src' => url($path),
             ),
           ),
