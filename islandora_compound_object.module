@@ -7,7 +7,6 @@
  *
  * Hook implementations and general functions.
  */
-
 define('ISLANDORA_COMPOUND_OBJECT_CMODEL', 'islandora:compoundCModel');
 
 /**
@@ -371,16 +370,17 @@ EOQ;
   drupal_json_output($matches);
 }
 
-
 /**
  * Implements hook_islandora_basic_collection_get_query_optionals().
  */
 function islandora_compound_object_islandora_basic_collection_get_query_optionals($type) {
-  if ($type == 'view') {
-    return format_string('?object <!uri!pred> ?compound', array(
-      '!uri' => FEDORA_RELS_EXT_URI,
-      '!pred' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'),
-    ));
+  if (variable_get('islandora_compound_object_hide_child_in_collection', TRUE)) {
+    if ($type == 'view') {
+      return format_string('?object <!uri!pred> ?compound', array(
+        '!uri' => FEDORA_RELS_EXT_URI,
+        '!pred' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'),
+      ));
+    }
   }
 }
 
@@ -388,8 +388,10 @@ function islandora_compound_object_islandora_basic_collection_get_query_optional
  * Implements hook_islandora_basic_collection_get_query_filters().
  */
 function islandora_compound_object_islandora_basic_collection_get_query_filters($type) {
-  if ($type == 'view') {
-    return '!bound(?compound)';
+  if (variable_get('islandora_compound_object_hide_child_in_collection', TRUE)) {
+    if ($type == 'view') {
+      return '!bound(?compound)';
+    }
   }
 }
 

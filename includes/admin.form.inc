@@ -27,6 +27,13 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#default_value' => variable_get('islandora_compound_object_thumbnail_child', TRUE),
   );
 
+  $form['islandora_compound_object_hide_child_in_collection'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Hide child objects in collection'),
+    '#description' => t('If checked, child objects will be hidden in their parent collections.'),
+    '#default_value' => variable_get('islandora_compound_object_hide_child_in_collection', TRUE),
+  );
+
   $form['islandora_compound_object_relationship'] = array(
     '#type' => 'textfield',
     '#title' => t('Child relationship predicate'),
