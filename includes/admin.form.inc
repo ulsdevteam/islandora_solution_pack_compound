@@ -65,7 +65,6 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#required' => TRUE,
   );
 
-
   $form['islandora_compound_object_use_jail_view'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use alternative, autoloading display for compounds?'),
