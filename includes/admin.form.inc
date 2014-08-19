@@ -98,7 +98,15 @@ function islandora_compound_object_admin_form_jail_validation(array $element, ar
   }
 }
 
-function islandora_compound_object_solr_fq_validate($element, &$form_state, $form) {
+/**
+ * Solr fq element state validation callback.
+ *
+ * @param array $element
+ *   The form element.
+ * @param array $form_state
+ *   The form state.
+ */
+function islandora_compound_object_solr_fq_validate($element, &$form_state) {
   if ($form_state['values']['islandora_compound_object_hide_child_objects_solr'] &&
     empty($form_state['values']['islandora_compound_object_solr_fq'])) {
     form_error($element, t('Solr filter query field is required.'));
