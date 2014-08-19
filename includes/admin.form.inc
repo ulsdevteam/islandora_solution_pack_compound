@@ -27,11 +27,34 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#default_value' => variable_get('islandora_compound_object_thumbnail_child', TRUE),
   );
 
-  $form['islandora_compound_object_hide_child_objects'] = array(
+  $form['islandora_compound_object_hide_child_objects_ri'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Hide child objects'),
+    '#title' => t('Hide child objects in RI Results'),
     '#description' => t('If checked, child objects will be hidden. Only visible within the compound context.'),
-    '#default_value' => variable_get('islandora_compound_object_hide_child_objects', TRUE),
+    '#default_value' => variable_get('islandora_compound_object_hide_child_objects_ri', TRUE),
+  );
+
+  $form['islandora_compound_object_hide_child_objects_solr'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Hide child objects in Solr results'),
+    '#description' => t('If checked, child objects will be hidden. Only visible within the compound context.'),
+    '#default_value' => variable_get('islandora_compound_object_hide_child_objects_solr', TRUE),
+  );
+
+  $form['islandora_compound_object_solr_fq'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Solr filter query'),
+    '#description' => t('Filter compound object children from Solr results.'),
+    '#default_value' => variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:*'),
+    '#element_validate' => array('islandora_compound_object_solr_fq_validate'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="islandora_compound_object_hide_child_objects_solr"]' => array('checked' => TRUE),
+      ),
+      'required' => array(
+        ':input[name="islandora_compound_object_hide_child_objects_solr"]' => array('checked' => TRUE),
+      ),
+    ),
   );
 
   $form['islandora_compound_object_relationship'] = array(
@@ -42,12 +65,7 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#required' => TRUE,
   );
 
-  $form['islandora_compound_object_solr_fq'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Solr filter query'),
-    '#description' => t('Filter compound object children from Solr results.'),
-    '#default_value' => variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:*'),
-  );
+
   $form['islandora_compound_object_use_jail_view'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use alternative, autoloading display for compounds?'),
@@ -77,5 +95,12 @@ function islandora_compound_object_admin_form_jail_validation(array $element, ar
     drupal_set_message(t('The <a href="@url">JAIL</a> library must be present in the libraries folder to use this display.', array(
       '@url' => url('https://github.com/sebarmeli/JAIL', array('absolute' => TRUE)),
     )), 'error');
+  }
+}
+
+function islandora_compound_object_solr_fq_validate($element, &$form_state, $form) {
+  if ($form_state['values']['islandora_compound_object_hide_child_objects_solr'] &&
+    empty($form_state['values']['islandora_compound_object_solr_fq'])) {
+    form_error($element, t('Solr filter query field is required.'));
   }
 }
