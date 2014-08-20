@@ -10,9 +10,7 @@ The Islandora Compound Object Solution Pack enables generic parent-child relatio
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
 
 If utilizing the lazy loading image ability of the solution pack, the [JAIL](https://github.com/sebarmeli/JAIL)
-library must be present within sites/all/libraries/JAIL. discoverygarden has a
-[fork](https://github.com/discoverygarden/JAIL.git) of JAIL that solves a
-serious performance issue.
+library must be present within sites/all/libraries/JAIL.
 
 ## Configuration
 
