@@ -29,7 +29,7 @@ function islandora_compound_object_admin_form($form, &$form_state) {
 
   $form['islandora_compound_object_hide_child_objects_ri'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Hide child objects in RI Results'),
+    '#title' => t('Hide child objects in RI results'),
     '#description' => t('If checked, child objects will be hidden. Only visible within the compound context.'),
     '#default_value' => variable_get('islandora_compound_object_hide_child_objects_ri', TRUE),
   );
