@@ -222,9 +222,9 @@ function islandora_compound_object_islandora_xml_form_builder_forms() {
 }
 
 /**
- * Implements hook_islandora_content_model_forms_form_associations().
+ * Implements hook_islandora_xml_form_builder_form_associations().
  */
-function islandora_compound_object_islandora_content_model_forms_form_associations() {
+function islandora_compound_object_islandora_xml_form_builder_form_associations() {
   return array(
     'islandora_compound_mods_form' => array(
       'content_model' => ISLANDORA_COMPOUND_OBJECT_CMODEL,
@@ -371,16 +371,17 @@ EOQ;
   drupal_json_output($matches);
 }
 
-
 /**
  * Implements hook_islandora_basic_collection_get_query_optionals().
  */
 function islandora_compound_object_islandora_basic_collection_get_query_optionals($type) {
-  if ($type == 'view') {
-    return format_string('?object <!uri!pred> ?compound', array(
-      '!uri' => FEDORA_RELS_EXT_URI,
-      '!pred' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'),
-    ));
+  if (variable_get('islandora_compound_object_hide_child_objects_ri', TRUE)) {
+    if ($type == 'view') {
+      return format_string('?object <!uri!pred> ?compound', array(
+        '!uri' => FEDORA_RELS_EXT_URI,
+        '!pred' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'),
+      ));
+    }
   }
 }
 
@@ -388,8 +389,10 @@ function islandora_compound_object_islandora_basic_collection_get_query_optional
  * Implements hook_islandora_basic_collection_get_query_filters().
  */
 function islandora_compound_object_islandora_basic_collection_get_query_filters($type) {
-  if ($type == 'view') {
-    return '!bound(?compound)';
+  if (variable_get('islandora_compound_object_hide_child_objects_ri', TRUE)) {
+    if ($type == 'view') {
+      return '!bound(?compound)';
+    }
   }
 }
 
@@ -397,9 +400,11 @@ function islandora_compound_object_islandora_basic_collection_get_query_filters(
  * Implements hook_islandora_solr_query().
  */
 function islandora_compound_object_islandora_solr_query($islandora_solr_query) {
-  $fq = variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]');
-  if (!empty($fq)) {
-    $islandora_solr_query->solrParams['fq'][] = $fq;
+  if (variable_get('islandora_compound_object_hide_child_objects_solr', TRUE)) {
+    $fq = variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]');
+    if (!empty($fq)) {
+      $islandora_solr_query->solrParams['fq'][] = $fq;
+    }
   }
 }
 
