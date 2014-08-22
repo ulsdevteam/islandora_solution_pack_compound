@@ -176,7 +176,7 @@ function islandora_compound_object_islandora_required_objects(IslandoraTuque $co
 
   $datastream = $compound_content_model->constructDatastream('DS-COMPOSITE-MODEL', 'X');
   $datastream->label = 'DS-COMPOSITE-MODEL';
-  $datastream->mimetype = 'text/xml';
+  $datastream->mimetype = 'application/xml';
   $datastream->setContentFromFile("$module_path/xml/islandora_compound_ds_composite_model.xml", FALSE);
   $compound_content_model->ingestDatastream($datastream);
 
@@ -188,7 +188,7 @@ function islandora_compound_object_islandora_required_objects(IslandoraTuque $co
 
   $datastream = $compound_collection->constructDatastream('COLLECTION_POLICY', 'X');
   $datastream->label = 'Collection policy';
-  $datastream->mimetype = 'text/xml';
+  $datastream->mimetype = 'application/xml';
   $datastream->setContentFromFile("$module_path/xml/islandora_compound_collection_policy.xml", FALSE);
   $compound_collection->ingestDatastream($datastream);
 
