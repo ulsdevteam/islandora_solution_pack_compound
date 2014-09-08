@@ -526,10 +526,10 @@ function islandora_compound_object_menu_local_tasks_alter(&$data, $router_item, 
       $compound_object = islandora_object_load($pid);
       $compound_info = islandora_compound_object_retrieve_compound_info($compound_object);
       if ($compound_info) {
-        drupal_set_title(t('@parent - @child', array(
-          '@parent' => $compound_info['parent_label'],
-          '@child' => $compound_info['label'],
-        )));
+        drupal_set_title(filter_xss(t('!parent - !child', array(
+          '!parent' => $compound_info['parent_label'],
+          '!child' => $compound_info['label'],
+        ))));
       }
       if (isset($data['tabs'][0]['output'])) {
         foreach ($data['tabs'][0]['output'] as $key => &$tab) {
