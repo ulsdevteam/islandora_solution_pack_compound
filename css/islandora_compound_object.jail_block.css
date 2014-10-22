@@ -1,8 +1,10 @@
 /* Display in Content Region */
 
+.islandora-compound-object-jail {
+  width: 95%;
+}
 #block-islandora-compound-object-compound-jail-display {
     height: 100px;
-
     height: 200px;
     width: 100%;
     overflow-x: hidden;
