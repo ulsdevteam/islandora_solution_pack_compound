@@ -8,7 +8,10 @@
     overflow-y: scroll;
     overflow: -moz-scrollbars-vertical;
     font-size: 90%;
-    text-align: center;
+}
+#block-islandora-compound-object-compound-jail-display > div {
+  border-bottom: 1px dotted #ccc;
+  padding-bottom: 1em;
 }
 #block-islandora-compound-object-compound-jail-display a {
   display: block;
@@ -22,6 +25,8 @@
 #block-islandora-compound-object-compound-jail-display .content img {
     margin: 0.5em 0.5em 1em 0;
     max-width: 70%;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: 1em;
 }
 
 /* Display in Sidebar Region */
