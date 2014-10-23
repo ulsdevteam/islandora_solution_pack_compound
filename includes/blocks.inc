@@ -69,9 +69,6 @@ function islandora_compound_object_jail_display_block() {
           $class[] = 'islandora-compound-object-jail-active';
         }
         $img = array(
-          'title' => array(
-            '#markup' => $sibling_object->label,
-          ),
           'image' => array(
             '#theme' => 'image',
             '#path' => "$module_path/images/loader.png",
@@ -79,21 +76,25 @@ function islandora_compound_object_jail_display_block() {
               'class' => $class,
               'data-src' => url($path),
             ),
-          ),
-          'noscript' => array(
-            '#theme' => 'image',
-            '#path' => $path,
-            '#prefix' => '<noscript>',
-            '#suffix' => '</noscript>',
+            '#href' => "islandora/object/$sibling",
           ),
         );
         $block[$sibling] = array(
-          '#theme' => 'link',
-          '#text' => drupal_render($img),
-          '#path' => "islandora/object/$sibling",
-          '#options' => array(
-            'attributes' => array(),
-            'html' => TRUE,
+          '#type' => 'container',
+          '#attributes' => array(),
+          'link' => array(
+            '#type' => 'link',
+            '#title' => t("@title", array("@title" => $sibling_object->label)),
+            '#href' => "islandora/object/$sibling",
+          ),
+          'content' => array(
+            '#theme' => 'link',
+            '#text' => drupal_render($img),
+            '#path' => "islandora/object/$sibling",
+            '#options' => array(
+              'attributes' => array(),
+              'html' => TRUE,
+            ),
           ),
         );
       }
