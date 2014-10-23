@@ -78,6 +78,12 @@ function islandora_compound_object_jail_display_block() {
             ),
             '#href' => "islandora/object/$sibling",
           ),
+          'noscript' => array(
+            '#theme' => 'image',
+            '#path' => $path,
+            '#prefix' => '<noscript>',
+            '#suffix' => '</noscript>',
+          ),
         );
         $block[$sibling] = array(
           '#type' => 'container',
