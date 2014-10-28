@@ -32,9 +32,10 @@
 /* Display in Sidebar Region */
 
 .sidebar #block-islandora-compound-object-compound-jail-display {
-  height: 700px;
+  height: 100%;
   width: auto;
   min-height: 400px;
+  max-height: 1100px;
 }
 .sidebar #block-islandora-compound-object-compound-jail-display .content img {
     width: 100%;
