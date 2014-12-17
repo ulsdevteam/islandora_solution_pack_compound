@@ -160,7 +160,7 @@ function islandora_compound_object_islandora_compoundcmodel_islandora_object_pur
   foreach ($parts as $part) {
     $escaped_pid = str_replace(':', '_', $pid);
     $child_object = islandora_object_load($part);
-    $child_object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $pid);
+    $child_object->relationships->remove(FEDORA_RELS_EXT_URI, $rels_predicate, $pid);
     $child_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
   }
 }
@@ -482,7 +482,7 @@ EOQ;
  */
 function islandora_compound_object_task_access(AbstractObject $object) {
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
-  $part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
+  $part_of = $object->relationships->get(FEDORA_RELS_EXT_URI, $rels_predicate);
   if (variable_get('islandora_compound_object_use_jail_view', FALSE) && islandora_object_access(ISLANDORA_VIEW_OBJECTS, $object) &&
     ((in_array('islandora:compoundCModel', $object->models) && islandora_compound_object_children_exist($object)) || !empty($part_of))) {
     return TRUE;
@@ -613,7 +613,7 @@ function islandora_compound_object_menu_local_tasks_alter(&$data, $router_item, 
  */
 function islandora_compound_object_retrieve_compound_info(AbstractObject $object) {
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
-  $part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
+  $part_of = $object->relationships->get(FEDORA_RELS_EXT_URI, $rels_predicate);
   $info = array();
   // This object is part of a compound object.
   if (!empty($part_of)) {
