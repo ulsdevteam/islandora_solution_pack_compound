@@ -393,7 +393,7 @@ function islandora_compound_object_update_sequence($parent_pid, $child_pid, $sta
   $escaped_pid = str_replace(':', '_', $parent_pid);
   $child_object = islandora_object_load($child_pid);
   $child_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
-  $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $start_seq, TRUE);
+  $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $start_seq, RELS_TYPE_PLAIN_LITERAL);
   $context['message'] = t('Inserting page "@label" (@pid) at position "@pos"', array(
     '@label' => $child_object->label,
     '@pid' => $child_object->id,
@@ -444,7 +444,7 @@ function islandora_compound_object_add_parent($objects, $parent_pids) {
       $children = islandora_compound_object_get_parts($parent_pid, TRUE);
       $insert_seq = islandora_compound_object_get_insert_sequence_number($children);
       $object->relationships->add(FEDORA_RELS_EXT_URI, $rels_predicate, $parent_pid);
-      $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
+      $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, RELS_TYPE_PLAIN_LITERAL);
     }
   }
 
