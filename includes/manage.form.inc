@@ -448,7 +448,6 @@ function islandora_compound_object_add_parent($objects, $parent_pids) {
       $object->relationships->add(FEDORA_RELS_EXT_URI, $rels_predicate, $parent_pid);
       $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, RELS_TYPE_PLAIN_LITERAL);
       $object->relationships->commitRelationships();
-      $object->relationships->autoCommit = TRUE;
     }
   }
 
