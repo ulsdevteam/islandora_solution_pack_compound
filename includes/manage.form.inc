@@ -148,7 +148,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
 
     // Do not allow repeated child.
     $child_object = islandora_object_load($form_state['values']['child']);
-    $child_part_of = $child_object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
+    $child_part_of = $child_object->relationships->get(FEDORA_RELS_EXT_URI, $rels_predicate);
     foreach ($child_part_of as $part) {
       if ($part['object']['value'] == $object->id) {
         form_set_error('child', t('The object is already a parent of the child.'));
@@ -180,7 +180,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     }
 
     // Do not allow repeated parent.
-    $parent_part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
+    $parent_part_of = $object->relationships->get(FEDORA_RELS_EXT_URI, $rels_predicate);
     foreach ($parent_part_of as $part) {
       if ($part['object']['value'] == $form_state['values']['parent']) {
         form_set_error('parent', t('The object is already a child of the parent.'));
@@ -393,7 +393,7 @@ function islandora_compound_object_update_sequence($parent_pid, $child_pid, $sta
   $escaped_pid = str_replace(':', '_', $parent_pid);
   $child_object = islandora_object_load($child_pid);
   $child_object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
-  $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $start_seq, TRUE);
+  $child_object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $start_seq, RELS_TYPE_PLAIN_LITERAL);
   $context['message'] = t('Inserting page "@label" (@pid) at position "@pos"', array(
     '@label' => $child_object->label,
     '@pid' => $child_object->id,
@@ -443,9 +443,10 @@ function islandora_compound_object_add_parent($objects, $parent_pids) {
     foreach ($objects as $object) {
       $children = islandora_compound_object_get_parts($parent_pid, TRUE);
       $insert_seq = islandora_compound_object_get_insert_sequence_number($children);
+
       $object->relationships->autoCommit = FALSE;
-      $object->relationships->add('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $parent_pid);
-      $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
+      $object->relationships->add(FEDORA_RELS_EXT_URI, $rels_predicate, $parent_pid);
+      $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, RELS_TYPE_PLAIN_LITERAL);
       $object->relationships->commitRelationships();
       $object->relationships->autoCommit = TRUE;
     }
@@ -472,7 +473,7 @@ function islandora_compound_object_remove_parent($objects, $parent_pids) {
     $escaped_pid = str_replace(':', '_', $parent_pid);
 
     foreach ($objects as $object) {
-      $object->relationships->remove('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $parent_pid);
+      $object->relationships->remove(FEDORA_RELS_EXT_URI, $rels_predicate, $parent_pid);
       $object->relationships->remove(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid");
     }
   }
