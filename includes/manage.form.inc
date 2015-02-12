@@ -443,8 +443,11 @@ function islandora_compound_object_add_parent($objects, $parent_pids) {
     foreach ($objects as $object) {
       $children = islandora_compound_object_get_parts($parent_pid, TRUE);
       $insert_seq = islandora_compound_object_get_insert_sequence_number($children);
+      $object->relationships->autoCommit = FALSE;
       $object->relationships->add('info:fedora/fedora-system:def/relations-external#', $rels_predicate, $parent_pid);
       $object->relationships->add(ISLANDORA_RELS_EXT_URI, "isSequenceNumberOf$escaped_pid", $insert_seq, TRUE);
+      $object->relationships->commitRelationships();
+      $object->relationships->autoCommit = TRUE;
     }
   }
 
