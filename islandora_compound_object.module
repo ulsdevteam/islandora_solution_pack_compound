@@ -621,32 +621,33 @@ function islandora_compound_object_retrieve_compound_info(AbstractObject $object
     foreach ($part_of as $part) {
       $parent_pid = $part['object']['value'];
       $parent = islandora_object_load($parent_pid);
+      if ($parent) {
+        $siblings = islandora_compound_object_get_parts($parent_pid);
+        $current_key = array_search($object->id, $siblings);
+        $previous_pid = (isset($siblings[$current_key - 1])) ? $siblings[$current_key - 1] : '';
+        $next_pid = (isset($siblings[$current_key + 1])) ? $siblings[$current_key + 1] : '';
 
-      $siblings = islandora_compound_object_get_parts($parent_pid);
-      $current_key = array_search($object->id, $siblings);
-      $previous_pid = (isset($siblings[$current_key - 1])) ? $siblings[$current_key - 1] : '';
-      $next_pid = (isset($siblings[$current_key + 1])) ? $siblings[$current_key + 1] : '';
-
-      // Check if perms to show link for parent manage.
-      if (islandora_object_manage_access_callback(array(
-        ISLANDORA_METADATA_EDIT, ISLANDORA_MANAGE_PROPERTIES, ISLANDORA_ADD_DS), $parent)) {
-        $parent_url = 'islandora/object/' . $parent_pid . '/manage';
+        // Check if perms to show link for parent manage.
+        if (islandora_object_manage_access_callback(array(
+          ISLANDORA_METADATA_EDIT, ISLANDORA_MANAGE_PROPERTIES, ISLANDORA_ADD_DS), $parent)) {
+          $parent_url = 'islandora/object/' . $parent_pid . '/manage';
+        }
+        else {
+          $parent_url = FALSE;
+        }
+        $info = array(
+          'parent_label' => $parent->label,
+          'parent_pid' => $parent_pid,
+          'parent_url' => $parent_url,
+          'previous_pid' => $previous_pid,
+          'next_pid' => $next_pid,
+          'child_count' => count($siblings),
+          'siblings' => $siblings,
+          'pid' => $object->id,
+          'label' => $object->label,
+          'sequence' => $current_key + 1,
+        );
       }
-      else {
-        $parent_url = FALSE;
-      }
-      $info = array(
-        'parent_label' => $parent->label,
-        'parent_pid' => $parent_pid,
-        'parent_url' => $parent_url,
-        'previous_pid' => $previous_pid,
-        'next_pid' => $next_pid,
-        'child_count' => count($siblings),
-        'siblings' => $siblings,
-        'pid' => $object->id,
-        'label' => $object->label,
-        'sequence' => $current_key + 1,
-      );
     }
   }
   return $info;
