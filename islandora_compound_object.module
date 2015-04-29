@@ -118,11 +118,13 @@ function islandora_compound_object_block_info() {
     'info' => t('Islandora Compound Object Navigation'),
     'visibility' => BLOCK_VISIBILITY_LISTED,
     'pages' => 'islandora/object/*',
+    'cache' => DRUPAL_NO_CACHE,
   );
   $blocks['compound_jail_display'] = array(
     'info' => t('Islandora Compound Object JAIL Display'),
     'visibility' => BLOCK_VISIBILITY_LISTED,
     'pages' => 'islandora/object/*',
+    'cache' => DRUPAL_NO_CACHE,
   );
   return $blocks;
 }
