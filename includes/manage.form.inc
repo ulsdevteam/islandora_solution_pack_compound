@@ -23,7 +23,7 @@ function islandora_compound_object_manage_form($form, &$form_state, $object) {
   $rels_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
 
   // Add child objects.
-  if (variable_get('islandora_compound_object_compound_children', TRUE) && in_array(ISLANDORA_COMPOUND_OBJECT_CMODEL, $object->models)) {
+  if ((variable_get('islandora_compound_object_compound_children', TRUE) && in_array(ISLANDORA_COMPOUND_OBJECT_CMODEL, $object->models)) || !variable_get('islandora_compound_object_compound_children', TRUE)) {
     $form['add_children'] = array(
       '#type' => 'fieldset',
       '#title' => t('Add Child Objects'),
@@ -63,45 +63,44 @@ function islandora_compound_object_manage_form($form, &$form_state, $object) {
         '#theme' => 'islandora_compound_object_draggable_table',
       ) + islandora_compound_object_get_tabledrag_element($object);
     }
-
-  }
-
-  // Add parents.
-  $form['add_to_parent'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Associate with Parent Object'),
-    '#description' => t('Add this object to a parent object'),
-  );
-  $form['add_to_parent']['parent'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Parent Object Pid/Label'),
-    '#autocomplete_path' => 'islandora_compound_object/autocomplete/parent',
-  );
-
-  // Remove parents.
-  $parent_part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
-  if (!empty($parent_part_of)) {
-    $form['parents'] = array(
+    
+    // Add parents.
+    $form['add_to_parent'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Unlink From Parent'),
-      '#description' => t('Remove the relationship between this object and parent objects.'),
+      '#title' => t('Associate with Parent Object'),
+      '#description' => t('Add this object to a parent object'),
+    );
+    $form['add_to_parent']['parent'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Parent Object Pid/Label'),
+      '#autocomplete_path' => 'islandora_compound_object/autocomplete/parent',
     );
 
-    $parents = array();
-    foreach ($parent_part_of as $parent) {
-      // Shouldn't be too much of a hit but would be good to avoid the
-      // islandora_object_loads.
-      $pid = $parent['object']['value'];
-      $parent_object = islandora_object_load($pid);
-      $parents[$pid] = array('title' => $parent_object->label, 'pid' => $pid);
+    // Remove parents.
+    $parent_part_of = $object->relationships->get('info:fedora/fedora-system:def/relations-external#', $rels_predicate);
+    if (!empty($parent_part_of)) {
+      $form['parents'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Unlink From Parent'),
+        '#description' => t('Remove the relationship between this object and parent objects.'),
+      );
+
+      $parents = array();
+      foreach ($parent_part_of as $parent) {
+        // Shouldn't be too much of a hit but would be good to avoid the
+        // islandora_object_loads.
+        $pid = $parent['object']['value'];
+        $parent_object = islandora_object_load($pid);
+        $parents[$pid] = array('title' => $parent_object->label, 'pid' => $pid);
+      }
+
+      $form['parents']['unlink_parents'] = array(
+        '#type' => 'tableselect',
+        '#title' => t('Parents'),
+        '#header' => array('title' => t('Title'), 'pid' => t('Object ID')),
+        '#options' => $parents,
+      );
     }
-
-    $form['parents']['unlink_parents'] = array(
-      '#type' => 'tableselect',
-      '#title' => t('Parents'),
-      '#header' => array('title' => t('Title'), 'pid' => t('Object ID')),
-      '#options' => $parents,
-    );
   }
 
   $form['object'] = array(
