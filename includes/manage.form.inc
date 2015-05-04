@@ -63,7 +63,7 @@ function islandora_compound_object_manage_form($form, &$form_state, $object) {
         '#theme' => 'islandora_compound_object_draggable_table',
       ) + islandora_compound_object_get_tabledrag_element($object);
     }
-    
+
     // Add parents.
     $form['add_to_parent'] = array(
       '#type' => 'fieldset',
