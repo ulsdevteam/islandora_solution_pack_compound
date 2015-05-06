@@ -127,14 +127,17 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
   // Child.
   if (!empty($form_state['values']['child'])) {
     // Check if valid child pid.
-    $compound = FALSE;
-    foreach ($object->models as $value) {
-      if ($value == "islandora:compoundCModel") {
-        $compound = TRUE;
+    if (variable_get('islandora_compound_object_compound_children', TRUE)) {
+      $compound = FALSE;
+      foreach ($object->models as $value) {
+        if ($value == "islandora:compoundCModel") {
+          $compound = TRUE;
+          break;
+        }
       }
-    }
-    if (!$compound) {
-      form_set_error('child', t('This object is not a compound object'));
+      if (!$compound) {
+        form_set_error('child', t('This object is not a compound object'));
+      }
     }
     if (!islandora_is_valid_pid($form_state['values']['child'])) {
       form_set_error('child', t('Invalid object supplied.'));
@@ -167,6 +170,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
       foreach ($parent->models as $value) {
         if ($value == "islandora:compoundCModel") {
           $compound = TRUE;
+          break;
         }
       }
       if (!$compound) {
@@ -191,7 +195,6 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     form_set_error('child', t('An object may not be the parent and child of the same object.'));
     form_set_error('parent');
   }
-
 }
 
 /**
