@@ -130,7 +130,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     if (variable_get('islandora_compound_object_compound_children', TRUE)) {
       $compound = FALSE;
       foreach ($object->models as $value) {
-        if ($value == "islandora:compoundCModel") {
+        if ($value == ISLANDORA_COMPOUND_OBJECT_CMODEL) {
           $compound = TRUE;
           break;
         }
@@ -168,7 +168,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
       $parent = islandora_object_load($form_state['values']['parent']);
       $compound = FALSE;
       foreach ($parent->models as $value) {
-        if ($value == "islandora:compoundCModel") {
+        if ($value == ISLANDORA_COMPOUND_OBJECT_CMODEL) {
           $compound = TRUE;
           break;
         }

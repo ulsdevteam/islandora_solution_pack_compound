@@ -18,7 +18,7 @@ function template_preprocess_islandora_compound_prev_next(array &$variables) {
   $folder_image_path = "$image_path/images/folder.png";
   $variables['parent_tn'] = NULL;
   $parent_object = islandora_object_load($variables['parent_pid']);
-  if ($parent_object && !in_array('islandora:compoundCModel', $parent_object->models)) {
+  if ($parent_object && !in_array(ISLANDORA_COMPOUND_OBJECT_CMODEL, $parent_object->models)) {
     if (isset($parent_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $parent_object['TN'])) {
       $variables['parent_tn'] = 'islandora/object/' . $parent_object->id . '/datastream/TN/view';
     }

@@ -42,11 +42,11 @@ function islandora_compound_object_setup_batch() {
   // Update all compound object child relationships to use
   // isConstituentOf.
   module_load_include('inc', 'islandora', 'includes/utilities');
-
+  
   $tuque = islandora_get_tuque_connection();
   $query = 'select $object $label from <#ri> where (
             $object <fedora-model:label> $label and
-            $object <info:fedora/fedora-system:def/model#hasModel> <info:fedora/islandora:compoundCModel> and
+            $object <info:fedora/fedora-system:def/model#hasModel> <info:fedora/' . ISLANDORA_COMPOUND_OBJECT_CMODEL . '> and
             $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>)
             order by $label';
   $results = $tuque->repository->ri->itqlQuery($query, 'unlimited');
