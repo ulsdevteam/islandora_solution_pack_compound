@@ -108,3 +108,34 @@ function islandora_compound_object_jail_display_block() {
   }
   return $block;
 }
+
+/**
+ * Constructs the default navigation block for a compound.
+ *
+ * @return array
+ *   Renderable array for the block.
+ */
+function islandora_compound_object_navigation_block() {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+  drupal_add_css(drupal_get_path('module', 'islandora_compound_object') . '/css/islandora_compound_object.block.css');
+  $object = menu_get_object('islandora_object', 2);
+  if ($object) {
+    // If only compound cmodel objects can be compound, this isn't necessary.
+    $children = islandora_compound_object_get_parts(arg(2));
+    $pid = (!empty($children)) ? $children[0] : arg(2);
+    $object = islandora_object_load($pid);
+    $output = '';
+    if ($object) {
+      $compound_info = islandora_compound_object_retrieve_compound_info($object);
+      // This object is part of a compound object.
+      if (!empty($compound_info)) {
+        $prev_next = theme('islandora_compound_prev_next', $compound_info);
+        $output .= $prev_next;
+      }
+
+      if (!empty($output)) {
+        return array('#markup' => $output);
+      }
+    }
+  }
+}
