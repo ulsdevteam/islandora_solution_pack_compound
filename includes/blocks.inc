@@ -112,17 +112,20 @@ function islandora_compound_object_jail_display_block() {
 /**
  * Constructs the default navigation block for a compound.
  *
+ * @param AbstractObject $object
+ *   If supplied the object to create the block for.
+ *
  * @return array
  *   Renderable array for the block.
  */
-function islandora_compound_object_navigation_block() {
+function islandora_compound_object_navigation_block(AbstractObject $object = NULL) {
   module_load_include('inc', 'islandora', 'includes/utilities');
   drupal_add_css(drupal_get_path('module', 'islandora_compound_object') . '/css/islandora_compound_object.block.css');
-  $object = menu_get_object('islandora_object', 2);
+  $object = $object ? $object : menu_get_object('islandora_object', 2);
   if ($object) {
     // If only compound cmodel objects can be compound, this isn't necessary.
-    $children = islandora_compound_object_get_parts(arg(2));
-    $pid = (!empty($children)) ? $children[0] : arg(2);
+    $children = islandora_compound_object_get_parts($object->id);
+    $pid = (!empty($children)) ? $children[0] : $object->id;
     $object = islandora_object_load($pid);
     $output = '';
     if ($object) {
