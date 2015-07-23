@@ -640,3 +640,14 @@ function islandora_compound_object_islandora_compound_object_management_control_
     'islandora/object/%/view',
   );
 }
+
+/**
+ * Implements hook_islandora_get_breadcrumb_query_predicates().
+ */
+function islandora_compound_object_islandora_get_breadcrumb_query_predicates(AbstractObject $object) {
+  if (variable_get('islandora_compound_object_show_compound_parents_in_breadcrumbs', FALSE)) {
+    return array(
+      format_string('fedora-rels-ext:!compound_rels', array('!compound_rels' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'))),
+    );
+  }
+}
