@@ -74,6 +74,11 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#default_value' => variable_get('islandora_compound_object_use_jail_view', FALSE),
     '#element_validate' => array('islandora_compound_object_admin_form_jail_validation'),
   );
+  $form['islandora_compound_object_show_compound_parents_in_breadcrumbs'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display compound object parents in the breadcrumbs on children objects.'),
+    '#default_value' => variable_get('islandora_compound_object_show_compound_parents_in_breadcrumbs', FALSE),
+  );
   return system_settings_form($form);
 }
 
