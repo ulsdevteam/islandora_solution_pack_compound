@@ -87,6 +87,47 @@ class IslandoraCompoundObjectZipBatchImporter extends ZipBatchImporter {
     );
     return $info;
   }
+
+  /**
+   * Helper function for getting info on the zip file..
+   *
+   * @return array
+   *   The ingest info.
+   */
+  protected static function getIngestInfo($file) {
+    $zip = new ZipArchive();
+    if (($error = $zip->open(drupal_realpath($file->uri))) !== TRUE) {
+      drupal_set_message(t('Error opening the provided Zip file.  Code: %code', array(
+        '%code' => $error,
+      )));
+      return;
+    }
+
+    $count = $zip->numFiles;
+    $file_names = array();
+    $info = array();
+    for ($i = 0; $i < $count; $i++) {
+      $name = $zip->getNameIndex($i);
+      $file_names[$name] = $name;
+    }
+    ksort($file_names);
+
+    foreach ($file_names as $file_name) {
+      $path_info = pathinfo($file_name);
+
+      $object_key = $path_info['dirname'] . '-_-' . $path_info['filename'];
+      if (strpos($path_info['dirname'], '__MACOSX') === FALSE
+        && isset($path_info['extension'])
+        && $path_info['extension'] != 'DS_Store') {
+        $datastream_key = strtolower($path_info['extension']);
+        $info[$object_key][$datastream_key] = $file_name;
+      }
+    }
+
+    $zip->close();
+
+    return $info;
+  }
 }
 
 /**
