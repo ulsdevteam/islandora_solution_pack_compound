@@ -87,6 +87,21 @@ class IslandoraCompoundObjectZipBatchImporter extends ZipBatchImporter {
     );
     return $info;
   }
+
+  /**
+   * Helper function for getting info on the zip file.
+   *
+   * @param object $file
+   *   The file object representing the ZIP to be processed.
+   *
+   * @return array
+   *   The ingest info.
+   */
+  protected static function getIngestInfo($file) {
+    $info = parent::getIngestInfo($file);
+    ksort($info);
+    return $info;
+  }
 }
 
 /**
