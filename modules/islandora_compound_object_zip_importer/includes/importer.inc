@@ -91,7 +91,7 @@ class IslandoraCompoundObjectZipBatchImporter extends ZipBatchImporter {
   /**
    * Helper function for getting info on the zip file.
    *
-   * @param stdClass $file
+   * @param object $file
    *   The file object representing the ZIP to be processed.
    *
    * @return array
