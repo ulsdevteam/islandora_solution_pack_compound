@@ -52,6 +52,11 @@ class IslandoraCompoundObjectZipBatchImporter extends ZipBatchImporter {
           '#description' => t('The namespace in which the imported objects will be created.'),
           '#default_value' => islandora_get_namespace($form_state['storage']['parent_pid']),
         ),
+        'immediate_ingest' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Ingest immediately?'),
+          '#default_value' => TRUE,
+        ),
         'submit' => array(
           '#type' => 'submit',
           '#value' => t('Import'),
@@ -84,6 +89,7 @@ class IslandoraCompoundObjectZipBatchImporter extends ZipBatchImporter {
       'processed_objects' => array(),
       'sequence_number' => $insert_seq,
       'parent_pid' => $parent_pid,
+      'immediate_ingest' => $form_state['values']['immediate_ingest'],
     );
     return $info;
   }
@@ -101,6 +107,13 @@ class IslandoraCompoundObjectZipBatchImporter extends ZipBatchImporter {
     $info = parent::getIngestInfo($file);
     ksort($info);
     return $info;
+  }
+
+  /**
+   * Inherited.
+   */
+  public function ingestImmediately() {
+    return $this->parameters['file']['immediate_ingest'];
   }
 }
 
