@@ -44,12 +44,21 @@ function islandora_compound_object_setup_batch() {
   module_load_include('inc', 'islandora', 'includes/utilities');
 
   $tuque = islandora_get_tuque_connection();
-  $query = 'select $object $label from <#ri> where (
-            $object <fedora-model:label> $label and
-            $object <info:fedora/fedora-system:def/model#hasModel> <info:fedora/' . ISLANDORA_COMPOUND_OBJECT_CMODEL . '> and
-            $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>)
-            order by $label';
-  $results = $tuque->repository->ri->itqlQuery($query, 'unlimited');
+  $query = <<<EOQ
+SELECT ?object ?label
+FROM <#ri>
+WHERE {
+  ?object <fedora-model:label> ?label ;
+          <fedora-model:hasModel> <info:fedora/!model> ;
+          <fedora-model:state> <fedora-model:Active>
+}
+ORDER BY ?label
+EOQ;
+  $query = format_string($query, array(
+    '!model' => ISLANDORA_COMPOUND_OBJECT_CMODEL,
+  ));
+
+  $results = $tuque->repository->ri->sparqlQuery($query, 'unlimited');
   $operations = array();
   foreach ($results as $compound_object) {
     array_push($operations, array("islandora_compound_object_batch_set_rels_predicate",
