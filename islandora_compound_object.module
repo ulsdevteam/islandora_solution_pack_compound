@@ -319,8 +319,8 @@ function islandora_compound_object_autocomplete($string, $parent = FALSE) {
   // - https://www.w3.org/TR/xmlschema-2/#dt-metac and
   // - https://www.w3.org/TR/xmlschema-2/#dt-cces1
   $meta = array(
-    '.',
     '\\',
+    '.',
     '?',
     '*',
     '+',
@@ -335,7 +335,7 @@ function islandora_compound_object_autocomplete($string, $parent = FALSE) {
     '^',
   );
   $escape_meta = function ($meta) {
-    return "\\$meta";
+    return "\\\\$meta";
   };
   $meta_replacements = drupal_map_assoc($meta, $escape_meta);
 
