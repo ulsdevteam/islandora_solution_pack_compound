@@ -18,7 +18,7 @@ Set the 'Child releationship predicate' and 'Solr filter query', as well as sele
 Optionally, enable the JAIL compound block to utilize the lazy loading image
 ability as outlined below.
 
-![Configuration](https://raw.githubusercontent.com/dmoses/islandora_screenshots/master/compound-admin.png)
+![Configuration](https://cloud.githubusercontent.com/assets/2738244/19966518/7943aba2-a1a2-11e6-8e17-9da13ef23fc6.png)
 
 **Block**:
 
