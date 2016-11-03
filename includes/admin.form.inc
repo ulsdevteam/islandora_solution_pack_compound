@@ -45,7 +45,7 @@ function islandora_compound_object_admin_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Solr filter query'),
     '#description' => t('Filter compound object children from Solr results.'),
-    '#default_value' => variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:*'),
+    '#default_value' => variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]'),
     '#element_validate' => array('islandora_compound_object_solr_fq_validate'),
     '#states' => array(
       'visible' => array(
