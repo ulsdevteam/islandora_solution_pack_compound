@@ -10,6 +10,8 @@
 
 define('ISLANDORA_COMPOUND_OBJECT_CMODEL', 'islandora:compoundCModel');
 
+const ISLANDORA_COMPOUND_OBJECT_LEGACY_BACKEND = 'islandora_compound_object_legacy_sparql';
+
 /**
  * Implements hook_menu().
  */
@@ -412,74 +414,27 @@ function islandora_compound_object_islandora_solr_query($islandora_solr_query) {
  * Return an array of pids that are part of a compound object.
  */
 function islandora_compound_object_get_parts($pid, $ret_title = FALSE) {
-  $rels_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
-  $objects = array();
 
-  global $user;
-  if ($user->uid === 0) {
-    $user_name = 'anonymous';
+  $backend = variable_get('islandora_compound_object_query_backend', ISLANDORA_COMPOUND_OBJECT_LEGACY_BACKEND);
+  $backends = module_invoke_all('islandora_compound_object_query_backends');
+
+  if (!isset($backends[$backend])) {
+    $backend = ISLANDORA_COMPOUND_OBJECT_LEGACY_BACKEND;
+  }
+
+  if (isset($backends[$backend]['file'])) {
+    require_once $backends[$backend]['file'];
+  }
+
+  $results = call_user_func($backends[$backend]['callable'], $pid);
+
+  if ($ret_title) {
+    $objects = $results;
   }
   else {
-    $user_name = $user->name;
-  }
-
-  $role_matches = array();
-  foreach ($user->roles as $role) {
-    $role_matches[] = "?role='{$role}'";
-  }
-  $role_matcher = implode(' || ', $role_matches);
-
-  $connection = islandora_get_tuque_connection();
-  $escaped_pid = str_replace(':', '_', $pid);
-  if ($connection) {
-    $query = <<<EOQ
-PREFIX islandora-rels-ext: <http://islandora.ca/ontology/relsext#>
-SELECT DISTINCT ?object ?title ?seq
-FROM <#ri>
-WHERE {
-  ?object <fedora-model:label> ?title ;
-          <fedora-rels-ext:$rels_predicate> <info:fedora/$pid> .
-  OPTIONAL {
-      ?object islandora-rels-ext:isSequenceNumberOf$escaped_pid ?seq
-  }
-  OPTIONAL {{
-      ?object <islandora-rels-ext:isViewableByRole> ?role
-    } UNION {
-      ?object <islandora-rels-ext:isViewableByUser> ?user
-  }}
-  FILTER((!bound(?role) && !bound(?user)) || (bound(?user) && ?user='{$user_name}') || (bound(?role) && ($role_matcher)))
-}
-EOQ;
-    $results = $connection->repository->ri->sparqlQuery($query);
-
-    // Sort the objects into their proper order.
-    $sort = function($a, $b) {
-      $a = $a['seq']['value'];
-      $b = $b['seq']['value'];
-      if ($a === $b) {
-        return 0;
-      }
-      if (empty($a)) {
-        return 1;
-      }
-      if (empty($b)) {
-        return -1;
-      }
-      return $a - $b;
-    };
-    uasort($results, $sort);
-
+    $objects = array();
     foreach ($results as $result) {
-      if ($ret_title) {
-        $objects[$result['object']['value']] = array(
-          'pid' => $result['object']['value'],
-          'title' => $result['title']['value'],
-          'seq' => $result['seq']['value'],
-        );
-      }
-      else {
-        $objects[] = $result['object']['value'];
-      }
+      $objects[] = $result['pid'];
     }
   }
 
@@ -699,4 +654,24 @@ function islandora_compound_object_islandora_get_breadcrumb_query_predicates(Abs
       format_string('fedora-rels-ext:!compound_rels', array('!compound_rels' => variable_get('islandora_compound_object_relationship', 'isConstituentOf'))),
     );
   }
+}
+
+/**
+ * Implements hook_islandora_compound_object_query_backends().
+ */
+function islandora_compound_object_islandora_compound_object_query_backends() {
+  $module_path = drupal_get_path('module', 'islandora_compound_object');
+
+  return array(
+    ISLANDORA_COMPOUND_OBJECT_LEGACY_BACKEND => array(
+      'title' => t('(Default) Legacy SPARQL - Does a SPARQL query followed by an access check.'),
+      'callable' => 'islandora_compound_object_legacy_query_sparql',
+      'file' => "$module_path/includes/backends.inc",
+    ),
+    'islandora_basic_collection_sparql_query_backend' => array(
+      'title' => t('SPARQL - Does a SPARQL query with filters. Generally faster than the default option.'),
+      'callable' => 'islandora_compound_object_query_sparql',
+      'file' => "$module_path/includes/backends.inc",
+    ),
+  );
 }
