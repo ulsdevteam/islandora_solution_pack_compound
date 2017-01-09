@@ -13,7 +13,7 @@ library must be present within sites/all/libraries/JAIL.
 
 ## Configuration
 
-Set the 'Child releationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
+Set the 'Child relationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
 
 Optionally, enable the JAIL compound block to utilize the lazy loading image
 ability as outlined below.
