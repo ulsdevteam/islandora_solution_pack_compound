@@ -564,7 +564,7 @@ function islandora_compound_object_menu_local_tasks_alter(&$data, $router_item, 
  *   either be the child of a compound, or the compound object itself.
  *
  * @return array
- *   An array describing the compound containining:
+ *   An array describing the compound containing:
  *   -parent_label: A string holding the parent label of the compound.
  *   -parent_pid: A string holding the pid of the root compound.
  *   -parent_url: A string containing the URL to the manage link for the root
