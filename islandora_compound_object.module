@@ -217,9 +217,9 @@ function islandora_compound_object_islandora_required_objects(IslandoraTuque $co
 }
 
 /**
- * Implements hook_islandora_xml_form_builder_forms().
+ * Implements hook_xml_form_builder_forms().
  */
-function islandora_compound_object_islandora_xml_form_builder_forms() {
+function islandora_compound_object_xml_form_builder_forms() {
   $module_path = drupal_get_path('module', 'islandora_compound_object');
   return array(
     'Compound Object MODS form' => array(
@@ -229,9 +229,9 @@ function islandora_compound_object_islandora_xml_form_builder_forms() {
 }
 
 /**
- * Implements hook_islandora_xml_form_builder_form_associations().
+ * Implements hook_xml_form_builder_form_associations().
  */
-function islandora_compound_object_islandora_xml_form_builder_form_associations() {
+function islandora_compound_object_xml_form_builder_form_associations() {
   return array(
     'islandora_compound_mods_form' => array(
       'content_model' => ISLANDORA_COMPOUND_OBJECT_CMODEL,
