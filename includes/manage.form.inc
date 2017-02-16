@@ -167,13 +167,7 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     }
     else {
       if (variable_get('islandora_compound_object_compound_children', TRUE)) {
-        $compound = FALSE;
-        foreach ($parent_object->models as $value) {
-          if ($value == ISLANDORA_COMPOUND_OBJECT_CMODEL) {
-            $compound = TRUE;
-            break;
-          }
-        }
+        $compound = in_array(ISLANDORA_COMPOUND_OBJECT_CMODEL, $parent_object->models));
         if (!$compound) {
           form_set_error('parent', t('The parent object (@pid) is not a compound object!', array('@pid' => $form_state['values']['parent'])));
         }
