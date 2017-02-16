@@ -167,9 +167,8 @@ function islandora_compound_object_manage_form_validate($form, &$form_state) {
     }
     else {
       if (variable_get('islandora_compound_object_compound_children', TRUE)) {
-        $parent = islandora_object_load($form_state['values']['parent']);
         $compound = FALSE;
-        foreach ($parent->models as $value) {
+        foreach ($parent_object->models as $value) {
           if ($value == ISLANDORA_COMPOUND_OBJECT_CMODEL) {
             $compound = TRUE;
             break;
