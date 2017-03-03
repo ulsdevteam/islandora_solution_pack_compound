@@ -562,7 +562,7 @@ function islandora_compound_object_menu_local_tasks_alter(&$data, $router_item, 
  * @param AbstractObject $object
  *   An AbstractObject representing an object within Fedora.
  * @param bool $allow_parent
- *   (Optional) If this is set to true, then this functin will return
+ *   (Optional) If this is set to true, then this function will return
  *   information about the compound if the passed in object is either
  *   a parent or a child, otherwise it will return an empty array.
  *
