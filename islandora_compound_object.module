@@ -268,17 +268,67 @@ function islandora_compound_object_access(AbstractObject $object) {
 }
 
 /**
- * Replaces parent object thumbnail with child's thumbnail.
+ * Implements hook_compound_cmodel_islandora_derivative().
  */
-function islandora_compound_object_update_parent_thumbnail($parent) {
+function islandora_compound_object_compoundCModel_islandora_derivative(AbstractObject $object = NULL, $ds_modified_params = array()) {
+  $module_path = drupal_get_path('module', 'islandora_compound_object');
+  $derivatives = array();
+  if (variable_get('islandora_compound_object_tn_deriv_hooks', FALSE)) {
+    $derivatives[] = array(
+      'source_dsid' => NULL,
+      'destination_dsid' => 'TN',
+      'function' => array('islandora_compound_object_create_thumbnail'),
+      'file' => "$module_path/includes/derivatives.inc",
+    );
+  }
+
+  return $derivatives;
+
+}
+
+/**
+ * Implements hook_islandora_derivative().
+ */
+function islandora_compound_object_islandora_derivative(AbstractObject $object) {
+  $module_path = drupal_get_path('module', 'islandora_compound_object');
+  $derivatives = array();
+  // Short circuit if feature is disabled.
+  if (variable_get('islandora_compound_object_tn_deriv_hooks', FALSE)) {
+    $derivatives[] = array(
+      'source_dsid' => 'TN',
+      'destination_dsid' => NULL,
+      'function' => array('islandora_compound_object_create_thumbnail_on_parent'),
+      'file' => "$module_path/includes/derivatives.inc",
+    );
+  }
+  return $derivatives;
+}
+
+/**
+ * Update a parent object's TN by deriving it's first child's TN.
+ *
+ * Note: This method does not enforce the relationship between
+ * parent/child if both are provided. It is left up to the caller
+ * to ensure that objects provided have the appropriate relationship.
+ *
+ * @param AbstractObject $parent
+ *   The compound object.
+ * @param AbstractObject $child
+ *   The child object (optional). Note: Ideally, this would be required.
+ *   Keeping it optional for backwards compatibility.
+ */
+function islandora_compound_object_update_parent_thumbnail(AbstractObject $parent, AbstractObject $child = NULL) {
   module_load_include('inc', 'islandora', 'includes/utilities');
-  $parts = islandora_compound_object_get_parts($parent->id);
-  if (!empty($parts)) {
-    $child = islandora_object_load($parts[0]);
-    // Child doesn't have a thumbnail then we can't set the parents TN either.
-    if (empty($child['TN'])) {
-      return;
+
+  // Leaving this part in for backwards compatibility. As per doc comment,
+  // it would be ideal for the caller to be required to provide both objects.
+  if ($child == NULL) {
+    $parts = islandora_compound_object_get_parts($parent->id);
+    if (!empty($parts)) {
+      $child = islandora_object_load($parts[0]);
     }
+  }
+  if ($child != NULL && !empty($child['TN'])) {
     $mime_detector = new MimeDetect();
     $ext = $mime_detector->getExtension($child['TN']->mimeType);
     // Windows will likely store temp data in a temp directory
@@ -289,17 +339,30 @@ function islandora_compound_object_update_parent_thumbnail($parent) {
     $child['TN']->getContent($file);
     if (empty($parent['TN'])) {
       $ds = $parent->constructDatastream('TN', 'M');
+      $ds->setContentFromFile($file, TRUE);
+      $ds->label = $child['TN']->label;
+      $ds->mimetype = $child['TN']->mimetype;
       $parent->ingestDatastream($ds);
     }
     else {
-      $ds = $parent['TN'];
+      // Check the size and then the content for equality.
+      // Only set if both are unequal.
+      if (($parent['TN']->size != $child['TN']->size) &&
+        $parent['TN']->content != $child['TN']->content) {
+        // Check label equality before setting label.
+        if ($parent['TN']->label != $child['TN']->label) {
+          $parent['TN']->label = $child['TN']->label;
+        }
+        // Check mimetype equality before setting mimetype.
+        if ($parent['TN']->mimeType != $child['TN']->mimetype) {
+          $parent['TN']->mimetype = $child['TN']->mimetype;
+        }
+        $parent['TN']->setContentFromFile($file, TRUE);
+      }
     }
-    $ds->setContentFromFile($file, TRUE);
-    $ds->label = 'Thumbnail';
-    $ds->mimetype = $mime_detector->getMimetype($file);
-
     file_unmanaged_delete($file);
   }
+  // Child doesn't have a thumbnail then we can't set the parents TN either.
   elseif (isset($parent['TN'])) {
     $parent->purgeDatastream('TN');
   }
