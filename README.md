@@ -30,6 +30,10 @@ Set the 'Child relationship predicate' and 'Solr filter query', as well as selec
 Optionally, enable the JAIL compound block to utilize the lazy loading image
 ability as outlined below.
 
+The additional step of editing the Solr slurp of RELS-EXT so that it does not index the fields that are like 'isSequenceNumberOf###'.  This can be done by adding a second condition to the xsl template match criteria in the RELS-EXT_to_solr.xsl (on line 38):
+    <xsl:template match="*[normalize-space(.) and not(contains(local-name(.), 'isSequenceNumberOf'))]" mode="rels_ext_element">
+
+
 ![Configuration](https://cloud.githubusercontent.com/assets/11573234/24557551/165e1a1c-1606-11e7-854b-0ec48ef29ae5.JPG)
 
 
