@@ -11,6 +11,7 @@
 define('ISLANDORA_COMPOUND_OBJECT_CMODEL', 'islandora:compoundCModel');
 
 const ISLANDORA_COMPOUND_OBJECT_LEGACY_BACKEND = 'islandora_compound_object_legacy_sparql';
+const ISLANDORA_COMPOUND_OBJECT_SPARQL_BACKEND = 'islandora_compound_object_sparql_query_backend';
 
 /**
  * Implements hook_menu().
@@ -786,7 +787,7 @@ function islandora_compound_object_islandora_compound_object_query_backends() {
       'callable' => 'islandora_compound_object_legacy_query_sparql',
       'file' => "$module_path/includes/backends.inc",
     ),
-    'islandora_basic_collection_sparql_query_backend' => array(
+    ISLANDORA_COMPOUND_OBJECT_SPARQL_BACKEND => array(
       'title' => t('SPARQL - Does a SPARQL query with filters. Generally faster than the default option.'),
       'callable' => 'islandora_compound_object_query_sparql',
       'file' => "$module_path/includes/backends.inc",
