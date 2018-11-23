@@ -10,17 +10,21 @@ This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 
-This module has the following as optional requirements for certain features:
+This module has also the following optional requirements for certain features:
+
+For Solr Search Integration, which allows the actual use of the 'Solr filter query' option and enables an aditional Solr Driven 'Compound Member Query' option:
+
+* [Islandora Solr Search](https://github.com/Islandora/islandora_solr_search) Module
 
 For Islandora Compound Object JAIL Display:
 
-* [JAIL](https://github.com/sebarmeli/JAIL) library 
+* [JAIL](https://github.com/sebarmeli/JAIL) JQuery library 
 
 ## Installation
 
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
 
-If utilizing the lazy loading image ability of the solution pack, the [JAIL](https://github.com/sebarmeli/JAIL)
+If utilizing the lazy loading image ability of the solution pack, the [JAIL](https://github.com/sebarmeli/JAIL) JQuery
 library must be present within sites/all/libraries/JAIL.
 
 ## Configuration
@@ -30,7 +34,11 @@ Set the 'Child relationship predicate' and 'Solr filter query', as well as selec
 Optionally, enable the JAIL compound block to utilize the lazy loading image
 ability as outlined below.
 
-![Configuration](https://user-images.githubusercontent.com/25011926/39889778-d1a91aca-5466-11e8-8eb1-1978cac81104.png)
+![Configuration](docs/compound-basic-settings.png))
+
+### Solr Integration
+
+If the Solr Search Module is enabled, and additional Compound Member Query Option and a new 'Solr Backend' Menu tab will be activated at Administration » Islandora » Solution Pack Configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object/solr)
 
 **Block**:
 
@@ -42,7 +50,7 @@ library which allows for lazy loading of images. This allows the block to load
 images only when they are being accessed which will greatly increase performance
 on compounds with many children.
 
-![compobjblocks_to_configure01b](https://cloud.githubusercontent.com/assets/11573234/24410256/9e01dfc0-13a0-11e7-9edf-454addc13128.JPG)
+![compobjblocks_to_configure](docs/compound-blocks.png)
 
 
 
