@@ -29,10 +29,13 @@ library must be present within sites/all/libraries/JAIL.
 
 ## Configuration
 
-Set the 'Child relationship predicate' and 'Solr filter query', as well as select options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
+Set the 'Child relationship predicate' and 'Solr filter query', as well as display options in search results and derivative creation options in Administration » Islandora » Solution pack configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object).
+
+The 'Redirect to first child when a compound object is requested' option skips the Islandora generated parent object display by redirecting, via HTTP, to the first visible child of a compound ensemble.
 
 Optionally, enable the JAIL compound block to utilize the lazy loading image
-ability as outlined below.
+ability using Javascript by checking 'Use alternative, alternative dsiplay for compounds' as shown below.
+
 
 ![Configuration](docs/compound-basic-settings.png)
 
