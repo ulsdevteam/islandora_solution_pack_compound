@@ -41,7 +41,7 @@ ability using Javascript by checking 'Use alternative, alternative dsiplay for c
 
 ### Solr Integration
 
-If the Solr Search Module is enabled, and additional Compound Member Query Option and a new 'Solr Backend' Menu tab will be activated at Administration » Islandora » Solution Pack Configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object/solr)
+If the Solr Search Module is enabled, an additional Compound Member Query Option and a new 'Solr Backend' Menu tab will be shown at Administration » Islandora » Solution Pack Configuration » Compound Object Solution Pack (admin/islandora/solution_pack_config/compound_object/solr)
 
 **Block**:
 
