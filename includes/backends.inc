@@ -13,7 +13,15 @@ function islandora_compound_object_legacy_query_sparql($pid) {
   $objects = array();
 
   $connection = islandora_get_tuque_connection();
-  $escaped_pid = str_replace(':', '_', $pid);
+  $escaped_pid = str_replace(
+    array(
+      ':',
+      '.',
+    ),
+    array(
+      '_',
+      '\.',
+    ), $pid);
   if ($connection) {
     $query = <<<EOQ
 PREFIX islandora-rels-ext: <http://islandora.ca/ontology/relsext#>
