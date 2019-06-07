@@ -33,7 +33,15 @@ This module provides a "Compound CModel". Objects of this type are shells to hol
 
 Compound relationships are managed through the __Manage » Compound__ tab which appears on all objects.
 
+
+The additional step of editing the Solr slurp of RELS-EXT so that it does not index the fields that are like 'isSequenceNumberOf###'.  This can be done by adding a second condition to the xsl template match criteria in the RELS-EXT_to_solr.xsl (on line 38):
+    <xsl:template match="*[normalize-space(.) and not(contains(local-name(.), 'isSequenceNumberOf'))]" mode="rels_ext_element">
+
+
+![Configuration](https://cloud.githubusercontent.com/assets/11573234/24557551/165e1a1c-1606-11e7-854b-0ec48ef29ae5.JPG)
+
 Navigation between objects linked by a Compound relationship requires a block to be placed on the interface in __Structure » Blocks__. This module provides two options: a standard Islandora Compound Object Navigation block, and the Islandora Compound JAIL Display, which uses a javascript library for lazy-loading (improving performance on compound objects with many children).
+
 
 ![compobjblocks_to_configure](docs/compound-blocks.png)
 
