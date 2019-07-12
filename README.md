@@ -79,7 +79,7 @@ Having problems or solved a problem? Check out the Islandora google groups for a
 ## Maintainers/Sponsors
 Current maintainers:
 
-* [Diego Pino](https://github.com/diegopino)
+* [Pat Dunlavey](https://github.com/patdunlavey)
 
 ## Development
 
